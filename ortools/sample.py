@@ -13,7 +13,7 @@ import collections
 from ortools.sat.python import cp_model
 
 
-
+print(3)
 df = pd.read_csv("input.csv", skiprows = 1)
 df.drop('Order', axis=1, inplace=True)
 np_df = df.as_matrix()
