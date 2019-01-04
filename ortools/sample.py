@@ -13,23 +13,111 @@ import collections
 from ortools.sat.python import cp_model
 
 
-print(3)
-df = pd.read_csv("input.csv", skiprows = 1)
-df.drop('Order', axis=1, inplace=True)
-np_df = df.as_matrix()
-print(np_df[1])
-size = 4
-jobs_data = []
-for jobs in range(size):   
-    job = []
-    for tasks in range(len(np_df[1])):
-       task = []
-       task.append(tasks)
-       task.append(np_df[jobs][tasks])
-       job.append(task)
-    jobs_data.append(job)
+
+
+df2 = pd.read_csv("input_ver2.1.csv", skiprows = 1)
+#print(df2)
+value = df2.as_matrix()
+
+df3 = pd.read_csv("capacity_info.csv")
+cap = df3.as_matrix()
+
+
+
+#print(value)
+
+#sub_order = collections.namedtuple('sub_orders', 'Order Milling Punching Welding HA Lens_cut Lens_a Manf FA')
+sub_order = collections.namedtuple('sub_orders', 'Order Milling')
+
+
+
+
+
+
+class sub_order():
+     def __init__(self, order_number, section, mill, punch, welding, house_a, lens_cut, lens_a, manu, final_a):
+        self.order_number = order_number
+        self.section = section
+        self.mill = mill
+        self.punch = punch
+        self.welding = welding
+        self.house_a = house_a
+        self.lens_cut = lens_cut
+        self.lens_a = lens_a
+        self.manu = manu
+        self.final_a = final_a
      
+
+
+class order(object):
+    def __init__(self, number, priority, duedate):
+        self.number = number
+        self.priority = priority
+        self.duedate = duedate
+    
+
+
+all_sub_orders = []
+all_orders = []
+counter = 0
+while(str(value[counter][0]).isdigit()):
+    counter+= 1
+    i = 0
+    all_sub_orders.append(sub_order (value[counter][0], value[counter][1] , value[counter][2] , value[counter][3] , 
+                                     value[counter][4] , value[counter][5] , value[counter][6] , value[counter][7], value[counter][8], value[counter][9]))
+all_sub_orders.pop()
+no_of_jobs = counter; 
+counter +=1
+
+
+
+for i in range(counter,len(value)): 
+    all_orders.append(order(value[i][0],value[i][1],value[i][2])) 
+
+#jobs_data = []
+#for j in range(no_of_jobs):   
+#    job = []
+#    for machines in range(7):
+#       task = []
+#       task.append(machine)
+#       task.append(np_df[jobs][tasks])
+#       job.append(task)
+#    jobs_data.append(job)
+     
+#print(jobs_data)
+
+
+
+cap_machine = {}
+for i in range(7):
+    cap_machine[cap[i][0]] = int(cap[i][1])
+cap_assembly = {}
+print(cap)
+for i in range(4):
+    cap_assembly[cap[8+i][0]] = int(cap[8+i][1])
+
+
+#print(cap_assembly)
+#print(all_sub_orders[1].mill)   
+
+jobs_data = []
+for s in all_sub_orders:
+   job = []
+   i = 0
+   for attr, value in s.__dict__.items():
+       task = []
+       task.append(i)
+       task.append(int(value))
+       job.append(task)
+   jobs_data.append(job)   
+
 print(jobs_data)
+#df = pd.read_csv("input.csv", skiprows = 1)
+#df.drop('Order', axis=1, inplace=True)
+#np_df = df.as_matrix()
+#print(np_df[1])
+#size = 4
+
 
   
 
