@@ -105,10 +105,12 @@ for s in all_sub_orders:
    job = []
    i = 0
    for attr, value in s.__dict__.items():
-       task = []
-       task.append(i)
-       task.append(int(value))
-       job.append(task)
+      if attr != 'order_number' and  attr != 'section' and  attr != 'final_a':
+        task = []
+        task.append(i)
+        task.append(int(value))
+        job.append(task)
+        i+=1
    jobs_data.append(job)   
 
 print(jobs_data)
@@ -173,8 +175,54 @@ def MinimalJobshopSat():
     model.Minimize(obj_var)
 
     #solve_model
+   
     solver = cp_model.CpSolver()
+    solver.parameters.max_time_in_seconds = 30.0
     status = solver.Solve(model)
+
+    if status == cp_model.FEASIBLE:
+        print('Feasible Schedule Length: %i' % solver.ObjectiveValue())
+        print()
+         # Create one list of assigned tasks per machine.
+        assigned_jobs = [[] for _ in all_machines]
+        for job in all_jobs:
+            for task_id, task in enumerate(jobs_data[job]):
+                machine = task[0]
+                assigned_jobs[machine].append(
+                    assigned_task_type(
+                        start=solver.Value(all_tasks[job, task_id].start),
+                        job=job,
+                        index=task_id))
+
+        disp_col_width = 10
+        sol_line = ''
+        sol_line_tasks = ''
+
+        print('Feasible Schedule', '\n')
+
+        for machine in all_machines:
+            # Sort by starting time.
+            assigned_jobs[machine].sort()
+            sol_line += 'Machine ' + str(machine) + ': '
+            sol_line_tasks += 'Machine ' + str(machine) + ': '
+
+            for assigned_task in assigned_jobs[machine]:
+                name = 'job_%i_%i' % (assigned_task.job, assigned_task.index)
+                # Add spaces to output to align columns.
+                sol_line_tasks += name + ' ' * (disp_col_width - len(name))
+                start = assigned_task.start
+                duration = jobs_data[assigned_task.job][assigned_task.index][1]
+
+                sol_tmp = '[%i,%i]' % (start, start + duration)
+                # Add spaces to output to align columns.
+                sol_line += sol_tmp + ' ' * (disp_col_width - len(sol_tmp))
+
+            sol_line += '\n'
+            sol_line_tasks += '\n'
+
+        print(sol_line_tasks)
+        print('Task Time Intervals\n')
+        print(sol_line)
 
     if status == cp_model.OPTIMAL:
         # Print out makespan.
@@ -307,4 +355,4 @@ def MinimalJobshopSat():
 
 
 
-#MinimalJobshopSat()
+MinimalJobshopSat()
