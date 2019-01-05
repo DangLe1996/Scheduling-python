@@ -8,6 +8,7 @@ Created on Mon Dec 31 14:20:26 2018
 from __future__ import print_function
 import pandas as pd
 import collections
+from assembly import MinimalJobshopSat
 
 # Import Python wrapper for or-tools CP-SAT solver.
 from ortools.sat.python import cp_model
@@ -49,7 +50,7 @@ class sub_order():
      
 
 
-class order(object):
+class order():
     def __init__(self, number, priority, duedate):
         self.number = number
         self.priority = priority

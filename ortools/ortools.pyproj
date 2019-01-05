@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>828956d7-6448-4e94-a6b5-b3c174554c5f</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>sample.py</StartupFile>
+    <StartupFile>machining.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,7 +21,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="sample.py" />
+    <Compile Include="assembly.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="machining.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
