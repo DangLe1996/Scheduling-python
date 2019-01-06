@@ -1,9 +1,10 @@
 ﻿Order,Status,Date available for assembly,Assembly Time,Duedate,Priority,qualified groups,,,
-1,Machine shop finished with cartridge,0,5,5,1,1,3,4,
-2,Wiring started without issue,4,8,4,3,1,2,3,4
-3,Machine shop finished without cartridge,2,11,2,2,2,4,,
-4,Body assembly finished with lens (B),1,9,4,1,3,4,2,
-5,Wiring started without issue,1,7,5,3,1,3,2,
-6,Saw Finished,1,6,3,1,1,3,4,
-7,Body assembly finished with lens (B),2,3,5,1,2,3,4,1
-8,Machine shop finished without cartridge,3,5,3,3,1,2,4,
+424,Machine shop finished with cartridge,0,5,5,1,1,3,4,
+142,Wiring started without issue,4,8,4,3,1,2,3,4
+454,Machine shop finished without cartridge,2,11,2,2,2,4,,
+323,Body assembly finished with lens (B),1,9,4,1,3,4,2,
+543,Wiring started without issue,1,7,5,3,1,3,2,
+323,Saw Finished,1,6,3,1,1,3,4,
+342,Body assembly finished with lens (B),2,3,5,1,2,3,4,1
+442,Machine shop finished without cartridge,3,5,3,3,1,2,4,
+565,Machine shop finished without cartridge,3,5,3,3,1,2,4,

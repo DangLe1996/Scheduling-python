@@ -13,18 +13,8 @@ from ortools.sat.python import cp_model
 
 df = pd.read_csv('assembly-input-1.csv')
 number_of_orders = len(df)
-#for iter in range(len(df)):
-#    for i, line in enumerate(df):
-#        print (line)
-class order():
-    def __init__(self, number, priority, duedate, status, a_time):
-        self.number = number
-        self.priority = priority
-        self.duedate = duedate
-        self.status = status
-        self.a_time = a_time
-    def set_group(self,group):
-        self.group = group
+
+
 
 class assemly_group():
      useage = 0
@@ -35,15 +25,10 @@ class assemly_group():
          self.useage = self.useage + int(value)
 
 
-all_orders = []
+
 all_groups = []
 useage = []
-for index, row in df.iterrows():
-    #print(row['Order'], row['Priority'])
-    
-    all_orders.append(order(int(row['Order']), int(row['Priority']), int(row['Duedate']), row['Status'], int(row['Assembly Time'])))
 
-#print(all_orders[1].status)
 
 for i in range(4):
     group = []
@@ -52,17 +37,16 @@ for i in range(4):
     all_groups.append(assemly_group(i))
     useage.append(group)
 
-for i in range(len(all_orders)):
-    print((all_orders[i].priority, all_orders[i].number))
-all_orders.sort(key = lambda x: x.priority, reverse = False)
 
 
 
-def assembly_schedule():
-    for i in range(len(all_orders)):
-        group = randint(0,3)
-        all_orders[i].set_group(group)
-        all_groups[group].update( all_orders[i].a_time)
+
+#def assembly_schedule():
+#    #all_orders.sort(key = lambda x: x.priority, reverse = False)
+#    for i in range(len(all_orders)):
+#        group = randint(0,3)
+#        all_orders[i].set_group(group)
+#        all_groups[group].update( all_orders[i].a_time)
 
 
 
@@ -171,7 +155,11 @@ def MinimalJobshopSat():
         print('Optimal Schedule Length: %i' % solver.ObjectiveValue())
         print()
 
-assembly_schedule()
+
+
+
+
+#assembly_schedule()
 
 
 #print(df['Current Status'])

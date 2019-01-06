@@ -13,124 +13,83 @@ from assembly import MinimalJobshopSat
 # Import Python wrapper for or-tools CP-SAT solver.
 from ortools.sat.python import cp_model
 
+def MachineShopScheduling(all_orders, all_sections, map_section):
+    #not_used = ['section', 'order_number','final_a',   'tasks', 'task_type']
+    sequence = ['mill', 'punch', 'welding', 'house_a', 'lens_cut', 'lens_a', 'manu']
+    #Create the model
+    model = cp_model.CpModel()
+    machine_count = len(sequence)
+    all_machines = range(machine_count)
+    #jobs_count = len(all_sections) #count how many jobs there is
+    jobs_count = 4 #count how many jobs there is
+    all_jobs = range(jobs_count)
+    #Compute horizon
+    horizon = sum(int(value)  for s in all_sections for attr, value in s.__dict__.items() 
+                  if attr in sequence)
 
+    task_type = collections.namedtuple('task_type', 'start end interval')
+    for o in all_orders:
+        #start_a_var = model.NewIntVar(0,horizon, 'start_assembly_%i' %(int(o.number)))
+        #duration = o.a_time
+        #end_a_var = model.NewIntVar(0,horizon, 'end_assembly_%i' %(int(o.number)))
+        #o.update_time(start_a_var, duration, end_a_var )
+        for s in o.sections:
+            for task_id, attr in enumerate(sequence):
+                     start_var = model.NewIntVar(0,horizon,'start_%i_%i_%i' %(o.number,s.section, task_id))
+                     duration = getattr(s,attr)
+                     end_var = model.NewIntVar(0,horizon,'end_%i_%i_%i' %(o.number,s.section, task_id))
+                     interval_var = model.NewIntervalVar(start_var,duration,end_var,'interval_%i_%i_%i'%(o.number,s.section,task_id))  
+                     s.update_time(attr,task_type(start_var,  end_var, interval_var))
 
-
-df2 = pd.read_csv("input_ver2.1.csv", skiprows = 1)
-#print(df2)
-value = df2.as_matrix()
-
-df3 = pd.read_csv("capacity_info.csv")
-cap = df3.as_matrix()
-
-
-
-#print(value)
-
-#sub_order = collections.namedtuple('sub_orders', 'Order Milling Punching Welding HA Lens_cut Lens_a Manf FA')
-sub_order = collections.namedtuple('sub_orders', 'Order Milling')
-
-
-
-
-
-
-class sub_order():
-     def __init__(self, order_number, section, mill, punch, welding, house_a, lens_cut, lens_a, manu, final_a):
-        self.order_number = order_number
-        self.section = section
-        self.mill = mill
-        self.punch = punch
-        self.welding = welding
-        self.house_a = house_a
-        self.lens_cut = lens_cut
-        self.lens_a = lens_a
-        self.manu = manu
-        self.final_a = final_a
-     
-
-
-class order():
-    def __init__(self, number, priority, duedate):
-        self.number = number
-        self.priority = priority
-        self.duedate = duedate
     
+     #create and add disjunctive constraints
+    for task_id, attr in enumerate(sequence): #enumerator
+            intervals = []
+            for o in all_orders:
+                for s in o.sections:
+                    intervals.append(s.tasks[attr].interval)
+            #add nonoverlapping constraint for each machine. 
+            model.AddNoOverlap(intervals)
+    
+     #Add precedent constraint
+    #for o in all_orders:
+    #    for s in o.sections:
+    #        for i in range(0,machine_count-1):
+    #            model.Add(s.tasks[sequence[i + 1]].start >= s.tasks[sequence[i]].end)
+   
+     #makespan objective
+    obj_var = model.NewIntVar(0,horizon,'makespan')
+    model.AddMaxEquality(obj_var,[s.tasks[sequence[-1]].end for o in all_orders for s in o.sections])
+    model.Minimize(obj_var)
 
+    solver = cp_model.CpSolver()
+    solver.parameters.max_time_in_seconds = 30.0
+  
+    status = solver.Solve(model)
 
-all_sub_orders = []
-all_orders = []
-counter = 0
-while(str(value[counter][0]).isdigit()):
-    counter+= 1
-    i = 0
-    all_sub_orders.append(sub_order (value[counter][0], value[counter][1] , value[counter][2] , value[counter][3] , 
-                                     value[counter][4] , value[counter][5] , value[counter][6] , value[counter][7], value[counter][8], value[counter][9]))
-all_sub_orders.pop()
-no_of_jobs = counter; 
-counter +=1
-
-
-
-for i in range(counter,len(value)): 
-    all_orders.append(order(value[i][0],value[i][1],value[i][2])) 
-
-#jobs_data = []
-#for j in range(no_of_jobs):   
-#    job = []
-#    for machines in range(7):
-#       task = []
-#       task.append(machine)
-#       task.append(np_df[jobs][tasks])
-#       job.append(task)
-#    jobs_data.append(job)
-     
-#print(jobs_data)
-
-
-
-cap_machine = {}
-for i in range(7):
-    cap_machine[cap[i][0]] = int(cap[i][1])
-cap_assembly = {}
-print(cap)
-for i in range(4):
-    cap_assembly[cap[8+i][0]] = int(cap[8+i][1])
-
-
-#print(cap_assembly)
-#print(all_sub_orders[1].mill)   
-
-jobs_data = []
-for s in all_sub_orders:
-   job = []
-   i = 0
-   for attr, value in s.__dict__.items():
-      if attr != 'order_number' and  attr != 'section' and  attr != 'final_a':
-        task = []
-        task.append(i)
-        task.append(int(value))
-        job.append(task)
-        i+=1
-   jobs_data.append(job)   
-
-print(jobs_data)
-#df = pd.read_csv("input.csv", skiprows = 1)
-#df.drop('Order', axis=1, inplace=True)
-#np_df = df.as_matrix()
-#print(np_df[1])
-#size = 4
+    if status == cp_model.FEASIBLE:
+        print('Feasible Schedule Length: %i' % solver.ObjectiveValue())
+        print()
+    if status == cp_model.OPTIMAL:
+        # Print out makespan.
+        print('Optimal Schedule Length: %i' % solver.ObjectiveValue())
+        print()
+    #for job in all_jobs:
+    #    for task_id in range(0,len(jobs_data[job]) -1 ):
+    #        model.Add(all_tasks[job, task_id + 1].start >= all_tasks[job, task_id].end)
+    
 
 
   
 
 
-def MinimalJobshopSat():
+def MinimalJobshopSat(jobs_data, all_orders):
     #Create the model
     model = cp_model.CpModel()
     machine_count = 1 + max(task[0] for job in jobs_data for task in job)
     all_machines = range(machine_count)
-    jobs_count = len(jobs_data) #count how many jobs there is
+    #jobs_count = len(jobs_data) #count how many jobs there is
+    jobs_count = 4 #count how many jobs there is
     all_jobs = range(jobs_count)
 
     #Compute horizon
@@ -140,9 +99,19 @@ def MinimalJobshopSat():
     #data type container
     #create a namedtuple that name task_type with three input parameter of start, end and interval.
     task_type = collections.namedtuple('task_type', 'start end interval')
+    assembly_type = collections.namedtuple('assembly_type', 'start end interval')
     #similar to the one above, with three variables of start, job and index. 
     #assigned task type is used to store solution. Not needed to define the problem. 
     assigned_task_type = collections.namedtuple('assigned_task_type', 'start job index')
+
+    #orders = {}
+    #for o in all_orders:
+    #    order = []
+    #    start_assembly_var = model.NewIntVar(0,horizon, 'start_assembly_%i' %(o))
+    #    duration = o.a_time
+    #    end_assembly_var = model.NewIntVar(0,horizon, 'end_assembly_%i' %(o))
+    #    orders[o.number] = assembly_type(start_assembly_var,
+    #                                                  duration, end_assembly_var)
 
     #create jobs
     all_tasks = {} #dictionary
@@ -154,7 +123,13 @@ def MinimalJobshopSat():
             interval_var = model.NewIntervalVar(start_var,duration,end_var,'interval_%i_%i'%(job,task_id))
             #use job and task_id to create a dictionary
             all_tasks[job,task_id] = task_type(start = start_var, end = end_var, interval = interval_var)
-    
+    #create assembly constraint
+
+     #for o in all_orders:
+     #    for s in o.sections:
+     #        model.Add(orders[o.number].start_assembly_var >=  )
+
+
     #create and add disjunctive constraints
     for machine in all_machines:
         intervals = []
@@ -166,9 +141,9 @@ def MinimalJobshopSat():
         model.AddNoOverlap(intervals)
 
     #Add precedent constraint
-    for job in all_jobs:
-        for task_id in range(0,len(jobs_data[job]) -1 ):
-            model.Add(all_tasks[job, task_id + 1].start >= all_tasks[job, task_id].end)
+    #for job in all_jobs:
+    #    for task_id in range(0,len(jobs_data[job]) -1 ):
+    #        model.Add(all_tasks[job, task_id + 1].start >= all_tasks[job, task_id].end)
 
     #makespan objective
     obj_var = model.NewIntVar(0,horizon,'makespan')
@@ -356,4 +331,4 @@ def MinimalJobshopSat():
 
 
 
-MinimalJobshopSat()
+
