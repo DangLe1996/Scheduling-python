@@ -21,7 +21,7 @@ def MachineShopScheduling(all_orders, all_sections, map_section):
     machine_count = len(sequence)
     all_machines = range(machine_count)
     #jobs_count = len(all_sections) #count how many jobs there is
-    jobs_count = 4 #count how many jobs there is
+    jobs_count = 2 #count how many jobs there is
     all_jobs = range(jobs_count)
     #Compute horizon
     horizon = sum(int(value)  for s in all_sections for attr, value in s.__dict__.items() 
@@ -39,24 +39,32 @@ def MachineShopScheduling(all_orders, all_sections, map_section):
                      duration = getattr(s,attr)
                      end_var = model.NewIntVar(0,horizon,'end_%i_%i_%i' %(o.number,s.section, task_id))
                      interval_var = model.NewIntervalVar(start_var,duration,end_var,'interval_%i_%i_%i'%(o.number,s.section,task_id))  
-                     s.update_time(attr,task_type(start_var,  end_var, interval_var))
+                     s.update_time(attr,task_type(start = start_var,  end = end_var, interval = interval_var))
 
     
      #create and add disjunctive constraints
+    count = 0
     for task_id, attr in enumerate(sequence): #enumerator
             intervals = []
             for o in all_orders:
                 for s in o.sections:
                     intervals.append(s.tasks[attr].interval)
             #add nonoverlapping constraint for each machine. 
+            count += 1
             model.AddNoOverlap(intervals)
-    
+    print('Number of precedent const is ' + str(count))
+
+
      #Add precedent constraint
-    #for o in all_orders:
-    #    for s in o.sections:
-    #        for i in range(0,machine_count-1):
-    #            model.Add(s.tasks[sequence[i + 1]].start >= s.tasks[sequence[i]].end)
-   
+    count = 0
+    for o in all_orders:
+        for s in o.sections:
+            for i in range(machine_count-1):
+                count += 1
+                model.Add(s.tasks[sequence[i + 1]].start >= s.tasks[sequence[i]].end)
+    print('Number of const is ' + str(count))
+
+
      #makespan objective
     obj_var = model.NewIntVar(0,horizon,'makespan')
     model.AddMaxEquality(obj_var,[s.tasks[sequence[-1]].end for o in all_orders for s in o.sections])
@@ -64,12 +72,17 @@ def MachineShopScheduling(all_orders, all_sections, map_section):
 
     solver = cp_model.CpSolver()
     solver.parameters.max_time_in_seconds = 30.0
-  
+    #status = 0
     status = solver.Solve(model)
 
     if status == cp_model.FEASIBLE:
         print('Feasible Schedule Length: %i' % solver.ObjectiveValue())
-        print()
+    #    print()
+    for o in all_orders:
+        for s in o.sections:
+            for i in range(machine_count):
+                s.start.append(solver.Value(s.tasks[sequence[i ]].start))
+                s.finish.append(solver.Value(s.tasks[sequence[i ]].end))
     if status == cp_model.OPTIMAL:
         # Print out makespan.
         print('Optimal Schedule Length: %i' % solver.ObjectiveValue())
@@ -86,10 +99,10 @@ def MachineShopScheduling(all_orders, all_sections, map_section):
 def MinimalJobshopSat(jobs_data, all_orders):
     #Create the model
     model = cp_model.CpModel()
-    machine_count = 1 + max(task[0] for job in jobs_data for task in job)
+    machine_count = 7
     all_machines = range(machine_count)
     #jobs_count = len(jobs_data) #count how many jobs there is
-    jobs_count = 4 #count how many jobs there is
+    jobs_count = len(jobs_data) #count how many jobs there is
     all_jobs = range(jobs_count)
 
     #Compute horizon
@@ -131,19 +144,27 @@ def MinimalJobshopSat(jobs_data, all_orders):
 
 
     #create and add disjunctive constraints
+    count = 0
     for machine in all_machines:
         intervals = []
         for job in all_jobs:
-            for task_id, task in enumerate(jobs_data[job]):
-                if task[0] == machine:
-                    intervals.append(all_tasks[job,task_id].interval)
+            #for task_id, task in enumerate(jobs_data[job]):
+            #    if task[0] == machine:
+                    intervals.append(all_tasks[job,machine].interval)
         #add nonoverlapping constraint for each machine. 
+        count +=1
         model.AddNoOverlap(intervals)
+    print('Number of precedent const is ' + str(count))
 
+
+    count = 0
     #Add precedent constraint
-    #for job in all_jobs:
-    #    for task_id in range(0,len(jobs_data[job]) -1 ):
-    #        model.Add(all_tasks[job, task_id + 1].start >= all_tasks[job, task_id].end)
+    for job in all_jobs:
+        for task_id in range(0,len(jobs_data[job]) -1 ):
+            count +=1
+            model.Add(all_tasks[job, task_id + 1].start >= all_tasks[job, task_id].end)
+    print('Number of const is ' + str(count))
+
 
     #makespan objective
     obj_var = model.NewIntVar(0,horizon,'makespan')
@@ -151,13 +172,17 @@ def MinimalJobshopSat(jobs_data, all_orders):
     model.Minimize(obj_var)
 
     #solve_model
+
    
     solver = cp_model.CpSolver()
     solver.parameters.max_time_in_seconds = 30.0
-    status = solver.Solve(model)
+    #status = solver.Solve(model)
+    status = 0
+    assigned_task_type = collections.namedtuple('assigned_task_type', 'start job index')
 
     if status == cp_model.FEASIBLE:
-        print('Feasible Schedule Length: %i' % solver.ObjectiveValue())
+
+        print('feasible schedule length: %i' % solver.ObjectiveValue())
         print()
          # Create one list of assigned tasks per machine.
         assigned_jobs = [[] for _ in all_machines]
@@ -203,7 +228,8 @@ def MinimalJobshopSat(jobs_data, all_orders):
     if status == cp_model.OPTIMAL:
         # Print out makespan.
         print('Optimal Schedule Length: %i' % solver.ObjectiveValue())
-        print()
+    #    print()
+
 
 #def MinimalJobshopSat():
 #    """Minimal jobshop problem."""

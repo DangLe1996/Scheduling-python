@@ -16,12 +16,13 @@ class order():
         self.duedate = duedate
         self.status = status
         self.a_time = a_time
+        self.qualified_group = []
     def set_group(self,group):
         self.group = group
     def add_section(self,value):
         self.sections.append(value)
         self.a_time += value.final_a
-    def update_time(self, start, finish, duration):
+    def update_time(self, start, finish, interval):
         self.start = start
         self.finish = finish
 
@@ -39,10 +40,12 @@ class sub_order():
         self.manu = manu
         self.final_a = final_a
         self.tasks = {}
+        self.start = []
+        self.finish = []
      def update_time(self,attr, task_type):
         self.tasks[attr] = task_type
        
-     
+
 
 
 
@@ -74,15 +77,31 @@ sequence = ['mill', 'punch', 'welding', 'house_a', 'lens_cut', 'lens_a', 'manu']
 jobs_data = []
 for s in all_sections:
    job = []
-   i = 0
+ 
    for index, attr in enumerate(sequence): #enumerator
         task = []
-        task.append(i)
+        task.append(index)
         task.append(getattr(s,attr))
         job.append(task)
-        i+=1
+       
    jobs_data.append(job) 
 
 
 MachineShopScheduling(all_orders, all_sections, map_section)
+
+for o in all_orders:
+    print(o.number)
+    for s in o.sections:
+        print(s.section)
+        for m in range(len(sequence)):
+            print (s.start[m], s.finish[m])
+            
+for i in range( len(sequence)):
+    print(sequence[i])
+    for o in all_orders:
+        for s in o.sections:
+                print (o.number, s.section, s.start[i], s.finish[i])
+    
+
+
 MinimalJobshopSat(jobs_data, all_orders)
