@@ -21,9 +21,6 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="assembly.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="machining.py" />
     <Compile Include="read_data.py">
       <SubType>Code</SubType>

@@ -4,8 +4,8 @@ import collections
 from machining import MinimalJobshopSat, MachineShopScheduling
 
 
-order_input = pd.read_csv('assembly-input-1.csv')
-section_input = pd.read_csv("input_ver2.1.csv", skiprows = 1)
+order_input = pd.read_csv('order_input.csv')
+section_input = pd.read_csv("section_input.csv", skiprows = 1)
 number_of_orders = len(order_input)
 
 class order():
@@ -53,8 +53,13 @@ all_orders = []
 all_sections = []
 map_order = {}
 map_section = {}
+#dict_order_attribute{
+#    'mill' : 
+#    }
+sequence = ['mill', 'punch', 'welding', 'house_a', 'lens_cut', 'lens_a', 'manu']
+
 for index, row in order_input.iterrows():
-    
+    #print(row['Unnamed: 7'])
     all_orders.append(order(int(row['Order']), int(row['Priority']), int(row['Duedate']), row['Status'], int(row['Assembly Time'])))
     map_order[int(row['Order'])] = all_orders[-1]
 
@@ -73,35 +78,43 @@ for index, row in section_input.iterrows():
     #map_section[int(row['Section'])] = int(row['Order'])
     #print(row)
 
-sequence = ['mill', 'punch', 'welding', 'house_a', 'lens_cut', 'lens_a', 'manu']
 jobs_data = []
-for s in all_sections:
-   job = []
+allowed_status = ['Machine Shop Started', 'Machine Shop Not Started']
+#for s in all_sections:
+#   job = []
  
-   for index, attr in enumerate(sequence): #enumerator
-        task = []
-        task.append(index)
-        task.append(getattr(s,attr))
-        job.append(task)
+#   for index, attr in enumerate(sequence): #enumerator
+#        task = []
+#        task.append(index)
+#        task.append(getattr(s,attr))
+#        job.append(task)
        
-   jobs_data.append(job) 
+#   jobs_data.append(job) 
 
 
-MachineShopScheduling(all_orders, all_sections, map_section)
+if(MachineShopScheduling(all_orders)):
 
-for o in all_orders:
-    print(o.number)
-    for s in o.sections:
-        print(s.section)
-        for m in range(len(sequence)):
-            print (s.start[m], s.finish[m])
-            
-for i in range( len(sequence)):
-    print(sequence[i])
+    f= open("output.txt","w+")
+
     for o in all_orders:
-        for s in o.sections:
-                print (o.number, s.section, s.start[i], s.finish[i])
+        if o.status in allowed_status:
+            f.write("%d ," % o.number)
+            #print(o.number)
+            for s in o.sections:
+                f.write("%d ," %s.section)
+                #print(s.section)
+                for m in range(len(sequence)):
+                    f.write("%d, " %(s.start[m] ))
+                    f.write("%d, " %( s.finish[m]))
+                    #print (s.start[m], s.finish[m])
+                f.write(" \n")
+            
+#for i in range( len(sequence)):
+#    print(sequence[i])
+#    for o in all_orders:
+#        for s in o.sections:
+#                print (o.number, s.section, s.start[i], s.finish[i])
     
 
 
-MinimalJobshopSat(jobs_data, all_orders)
+#MinimalJobshopSat(jobs_data, all_orders)
