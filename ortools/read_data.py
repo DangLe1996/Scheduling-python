@@ -92,22 +92,22 @@ allowed_status = ['Machine Shop Started', 'Machine Shop Not Started']
 #   jobs_data.append(job) 
 
 
-if(MachineShopScheduling(all_orders)):
+#if(MachineShopScheduling(all_orders)):
 
-    f= open("output.txt","w+")
+#    f= open("output.txt","w+")
 
-    for o in all_orders:
-        if o.status in allowed_status:
-            f.write("%d ," % o.number)
-            #print(o.number)
-            for s in o.sections:
-                f.write("%d ," %s.section)
-                #print(s.section)
-                for m in range(len(sequence)):
-                    f.write("%d, " %(s.start[m] ))
-                    f.write("%d, " %( s.finish[m]))
-                    #print (s.start[m], s.finish[m])
-                f.write(" \n")
+#    for o in all_orders:
+#        if o.status in allowed_status:
+#            f.write("%d ," % o.number)
+#            #print(o.number)
+#            for s in o.sections:
+#                f.write("%d ," %s.section)
+#                #print(s.section)
+#                for m in range(len(sequence)):
+#                    f.write("%d, " %(s.start[m] ))
+#                    f.write("%d, " %( s.finish[m]))
+#                    #print (s.start[m], s.finish[m])
+#                f.write(" \n")
             
 #for i in range( len(sequence)):
 #    print(sequence[i])
