@@ -1,16 +1,12 @@
 from __future__ import print_function
 import pandas as pd
 import collections
-from machining import MachineShopScheduling
+import random 
+import math
+from machining import MachineShopScheduling, AssemblyScheduling
 import time
 
-#order_input = pd.read_csv('order_input.csv')
-fields = ['Order', 'Line', 'Status', 'Sched. Ship Date',
-         'Real Status' , 'Real Time', 'Promised' ,'Missing Materials' ]
-#section_input = pd.read_csv("Axis-Assembly-Input.csv", skiprows = 1)
-assembly_input = pd.read_csv("Axis-Assembly-Input.csv", skipinitialspace=True, usecols=fields)
 
-#number_of_orders = len(order_input)
 
 class order():
     def __init__(self, number):
@@ -39,35 +35,65 @@ class sub_order():
         self.tasks[attr] = task_type
        
 
-all_orders = []
+assembly_orders = []
 all_sections = []
 map_order = {}
-priority_rank = {
+def read_data_assembly():
+    
+#order_input = pd.read_csv('order_input.csv')
+    fields = ['Order', 'Line', 'Status', 'Sched. Ship Date',
+             'Real Status' , 'Real Time', 'Promised' ,'Missing Materials' ]
+    #section_input = pd.read_csv("Axis-Assembly-Input.csv", skiprows = 1)
+    assembly_input = pd.read_csv("Axis-Assembly-Input.csv", skipinitialspace=True, usecols=fields)
+    priority_rank = {
     'High Priority': 1,
     'Priority' : 2,
     'Regular': 3
 
-}
-status_rank = {
-    'Wiring Started': 1,
-    'Machine Shop Finished' : 2,
-    'Scheduled/Released': 3, 
-    'Machine Shop Started': 4
-
     }
-for index, row in assembly_input.iterrows():
-    if(row['Order'] not in map_order):
-        s = order(row['Order'])
-        all_orders.append(s)
-        map_order[row['Order']] = s
-    o = sub_order(index)
-    for value in fields:
-        setattr(o, value, row[value])
-    setattr(o, 'priority', priority_rank[o.Promised])
-    o.Status = status_rank[o.Status]
-    map_order[o.Order].add_section(o)
+    status_rank = {
+        'Wiring Started': 1,
+        'Machine Shop Finished' : 2,
+        'Scheduled/Released': 3, 
+        'Machine Shop Started': 4
+
+        }
+    for index, row in assembly_input.iterrows():
+        if(row['Status'] in status_rank):
+            if(row['Order'] not in map_order):
+                ord = order(row['Order'])
+                map_order[row['Order']] = ord
+            sub = sub_order(index)
+            for value in fields:
+                setattr(sub, value, row[value])
+            setattr(sub, 'priority', priority_rank[sub.Promised])
+            sub.Status = status_rank[sub.Status]
+            map_order[sub.Order].add_section(sub)
+            map_order[sub.Order].a_time += math.ceil(getattr(sub,'Real Time'))
+
+    
+
+#number_of_orders = len(order_input)
+
+
+def generate_assembly_schedule(args):
+    for i in range(1,3):
+        for index, value in map_order.items():
+              num = []
+              [num.append(s.Status) for s in value.sections]
+              setattr(value, 'Status', max(num))
+              if value.Status == i :
+                  assembly_orders.append(value)
+              foo = [1,2,3,4]
+              random.shuffle(foo)
+              value.qualified_group = foo[: random.randint(1, 4)]
+        AssemblyScheduling(assembly_orders)
+        assembly_orders.clear()
+    print("fnish")
    
-print("fnish")
+read_data_assembly()
+generate_assembly_schedule()
+
 #map_section = {}
 #dict_order_attribute = {
    

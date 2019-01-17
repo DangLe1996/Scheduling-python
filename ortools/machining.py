@@ -8,6 +8,7 @@ Created on Mon Dec 31 14:20:26 2018
 from __future__ import print_function
 import pandas as pd
 import collections
+import math
 
 
 # Import Python wrapper for or-tools CP-SAT solver.
@@ -99,5 +100,94 @@ def MachineShopScheduling(all_orders):
     
 
 def AssemblyScheduling(all_orders):
-    pass
+
+    print("Number of Order in Assembly is ", len(all_orders))
+       # Instantiate a cp model.
+   
+    horizon = sum(o.a_time for o in all_orders); 
+    horizon =math.ceil(horizon )
+    model = cp_model.CpModel()
+    # Variables
+    makespan = model.NewIntVar(0, horizon, 'makespan')
+    x = {}
+    start= {}
+    y = {}
+    inter = []
+    for o in all_orders:
+        t = []
+        for p in all_orders :
+            if p.number >  o.number:
+                inter = intersection(o.qualified_group, p.qualified_group)
+                if(len(inter) > 0):
+                    for r in inter:
+                        y[(o.number, p.number, r)] = model.NewBoolVar('y[%i,%i, %i]' % (o.number, p.number, r))
+        for g in o.qualified_group: 
+            x[(o.number,g)] = model.NewBoolVar('x[%i,%i]' % (o.number, g))
+        start[o.number] = model.NewIntVar(0,horizon,'start[%i]' % o.number)
+
+    ## Constraints
+
+    # Each task is assigned one qualified group.
+    [model.Add(sum(x[(o.number, g)] for g in o.qualified_group) == 1) for o in all_orders]
+
+    for o in all_orders:
+        for p in all_orders :
+            if p.number > o.number:
+                inter = intersection(o.qualified_group, p.qualified_group)
+                if(len(inter) > 0):
+                    for r in inter:
+                        model.Add(start[o.number] >= start[p.number] + p.a_time).OnlyEnforceIf(x[(o.number, r)] and x[(p.number, r)] and y[(o.number, p.number, r)])
+                        model.Add(start[p.number] >= start[o.number] + o.a_time).OnlyEnforceIf(x[(o.number, r)] and x[(p.number, r)] and y[(o.number, p.number, r)].Not())
+                        #model.Add(y[(o.number, p.number, r)] + y[(o.number, p.number, r)] == 1).OnlyEnforceIf(x[(o.number, r)] and x[(p.number, r)])
+
+    ## Total task size for each worker is at most total_size_max
+    ##for i in all_workers:
+    ##    model.Add(sum(sizes[j] * x[i][j] for j in all_tasks) <= total_size_max)
+
+    ## Total cost
+    [model.Add(makespan >= start[o.number] + o.a_time)  for o in all_orders]
+    model.Minimize(makespan)
+
+    solver = cp_model.CpSolver()
+    solver.parameters.max_time_in_seconds = 10.0
+    status = solver.Solve(model)
+    print('Status is ', solver.StatusName(status))
+    if status == cp_model.FEASIBLE:
+        print('Feasible sol = %i' % solver.ObjectiveValue())
+        assign_solution(solver, all_orders, start, x)
+    if status == cp_model.OPTIMAL:
+        print('Optimal sol = %i' % solver.ObjectiveValue())
+        assign_solution(solver,all_orders, start, x)
+        #print()
+        #for i in all_workers:
+        #    for j in all_tasks:
+        #        if solver.Value(x[i][j]) == 1:
+        #            print('Worker ', i, ' assigned to task ', j, '  Cost = ',
+        #                  cost[i][j])
+
+        #print()
+
+    #print('Statistics')
+    #print('  - conflicts : %i' % solver.NumConflicts())
+    #print('  - branches  : %i' % solver.NumBranches())
+    #print('  - wall time : %f s' % solver.WallTime())
+
+def assign_solution(solver, all_orders, start, x):
+    for o in all_orders:
+            setattr(o, 'start', solver.Value(start[o.number]))
+            setattr(o, 'finish', o.start + o.a_time)
+            for g in o.qualified_group:
+                if solver.Value(x[(o.number,g)]) == 1:
+                    setattr(o, 'group', g)
+
   
+def common_member(a, b): 
+    a_set = set(a) 
+    b_set = set(b) 
+    if (a_set & b_set): 
+        return True 
+    else: 
+        return False
+
+def intersection(lst1, lst2): 
+    return list(set(lst1) & set(lst2))

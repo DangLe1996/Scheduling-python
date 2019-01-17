@@ -1,0 +1,4 @@
+- Classified the orders into 1 to 6
+- Create a assembly model 
+- print out output to nicer form
+- migrate the alg best fit from c++ 
