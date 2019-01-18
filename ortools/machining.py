@@ -101,7 +101,6 @@ def MachineShopScheduling(all_orders):
 
 def AssemblyScheduling(all_orders):
 
-    print("Number of Order in Assembly is ", len(all_orders))
        # Instantiate a cp model.
    
     horizon = sum(o.a_time for o in all_orders); 
@@ -116,29 +115,55 @@ def AssemblyScheduling(all_orders):
     for o in all_orders:
         t = []
         for p in all_orders :
-            if p.number >  o.number:
-                inter = intersection(o.qualified_group, p.qualified_group)
-                if(len(inter) > 0):
-                    for r in inter:
-                        y[(o.number, p.number, r)] = model.NewBoolVar('y[%i,%i, %i]' % (o.number, p.number, r))
-        for g in o.qualified_group: 
+            if p.number !=  o.number:
+                try:
+                    inter = intersection(o.qualified_group, p.qualified_group)
+                    if(len(inter) > 0):
+                        for r in inter:
+                            y[(o.number, p.number, r)] = model.NewBoolVar('y[%i,%i, %i]' % (o.number, p.number, r))
+                except TypeError:
+                    if o.qualified_group ==  p.qualified_group :
+                        inter = o.qualified_group
+                        y[(o.number, p.number, inter)] = model.NewBoolVar('y[%i,%i, %i]' % (o.number, p.number, inter))
+        try:       
+            for g in o.qualified_group: 
+                x[(o.number,g)] = model.NewBoolVar('x[%i,%i]' % (o.number, g))
+            start[o.number] = model.NewIntVar(0,horizon,'start[%i]' % o.number)
+        except TypeError:
+            g = o.qualified_group
             x[(o.number,g)] = model.NewBoolVar('x[%i,%i]' % (o.number, g))
-        start[o.number] = model.NewIntVar(0,horizon,'start[%i]' % o.number)
+            start[o.number] = model.NewIntVar(0,horizon,'start[%i]' % o.number)
+
 
     ## Constraints
 
     # Each task is assigned one qualified group.
-    [model.Add(sum(x[(o.number, g)] for g in o.qualified_group) == 1) for o in all_orders]
+    for o in all_orders:
+        try:
+            model.Add(sum(x[(o.number, g)] for g in o.qualified_group) == 1) 
+        except TypeError:
+            model.Add(x[(o.number, o.qualified_group)]  == 1) 
 
     for o in all_orders:
         for p in all_orders :
-            if p.number > o.number:
-                inter = intersection(o.qualified_group, p.qualified_group)
-                if(len(inter) > 0):
-                    for r in inter:
+            if p.number != o.number:
+                try:
+                    inter = intersection(o.qualified_group, p.qualified_group)
+                    if(len(inter) > 0):
+                        for r in inter:
+                             model.Add(start[o.number] >= start[p.number] + p.a_time).OnlyEnforceIf(y[(o.number, p.number, r)])
+                             model.Add(start[p.number] >= start[o.number] + o.a_time).OnlyEnforceIf(y[(p.number, o.number, r)])
+                             model.Add(y[(o.number, p.number, r)] + y[(p.number, o.number, r)] == 1).OnlyEnforceIf(x[(o.number, r)] and x[(p.number, r)])
+                            
+                            #model.add(y[(o.number, p.number, r)] == 0).OnlyEnforceIf(x[(o.number, r)].Not())
+                            #model.add(y[(o.number, p.number, r)] == 0).OnlyEnforceIf(x[(p.number, r)].Not())
+                           
+                            #model.Add(y[(o.number, p.number, r)] + y[(o.number, p.number, r)] == 1).OnlyEnforceIf(x[(o.number, r)] and x[(p.number, r)])
+                except TypeError:
+                    if o.qualified_group ==  p.qualified_group :
+                        r = o.qualified_group
                         model.Add(start[o.number] >= start[p.number] + p.a_time).OnlyEnforceIf(x[(o.number, r)] and x[(p.number, r)] and y[(o.number, p.number, r)])
                         model.Add(start[p.number] >= start[o.number] + o.a_time).OnlyEnforceIf(x[(o.number, r)] and x[(p.number, r)] and y[(o.number, p.number, r)].Not())
-                        #model.Add(y[(o.number, p.number, r)] + y[(o.number, p.number, r)] == 1).OnlyEnforceIf(x[(o.number, r)] and x[(p.number, r)])
 
     ## Total task size for each worker is at most total_size_max
     ##for i in all_workers:
@@ -149,7 +174,7 @@ def AssemblyScheduling(all_orders):
     model.Minimize(makespan)
 
     solver = cp_model.CpSolver()
-    solver.parameters.max_time_in_seconds = 10.0
+    solver.parameters.max_time_in_seconds = 5.0
     status = solver.Solve(model)
     print('Status is ', solver.StatusName(status))
     if status == cp_model.FEASIBLE:
@@ -176,9 +201,13 @@ def assign_solution(solver, all_orders, start, x):
     for o in all_orders:
             setattr(o, 'start', solver.Value(start[o.number]))
             setattr(o, 'finish', o.start + o.a_time)
-            for g in o.qualified_group:
-                if solver.Value(x[(o.number,g)]) == 1:
-                    setattr(o, 'group', g)
+            try:
+                for g in o.qualified_group:
+                    if solver.Value(x[(o.number,g)]) == 1:
+                        setattr(o, 'group', g)
+            except TypeError: 
+                setattr(o, 'group', o.qualified_group)
+
 
   
 def common_member(a, b): 
