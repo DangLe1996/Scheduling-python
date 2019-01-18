@@ -35,7 +35,7 @@ class sub_order():
         self.tasks[attr] = task_type
 
 f= open("output.csv","a")
-f.write('Order, Assigned Group, Start Date, Start Time, Finish day, Finish time, Assembly Time \n')
+f.write('Order, Assigned Group, Start Date, Start Time, Finish day, Finish time, Assembly Time, Status \n')
 
 
 all_sections = []
@@ -118,12 +118,12 @@ useage= {
     }
 def assign_date(assembly_orders,f, status):
     assembly_orders.sort(key = attrgetter('group', 'start'), reverse=False)
-    output = ['number', 'group', 'start_day', 'start', 'finish_day', 'finish', 'a_time']
+    output = ['number', 'group', 'start_day', 'start', 'finish_day', 'finish', 'a_time', 'Status']
     line = []
     for o in assembly_orders:
-        #if(status > 1):
-        #    o.start = o.start + useage[o.group]
-        #    o.finish = o.start + o.a_time
+        if(status > 1):
+            o.start = o.start + useage[o.group]
+            o.finish = o.start + o.a_time
         value = math.floor((o.start)/ (60*capacity[o.group]))
         setattr(o, 'start_day', value )
         value = math.floor((o.finish) / (60*capacity[o.group]))

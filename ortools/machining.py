@@ -146,14 +146,16 @@ def AssemblyScheduling(all_orders):
 
     for o in all_orders:
         for p in all_orders :
-            if p.number != o.number:
+            if p.number > o.number:
                 try:
                     inter = intersection(o.qualified_group, p.qualified_group)
                     if(len(inter) > 0):
                         for r in inter:
                              model.Add(start[o.number] >= start[p.number] + p.a_time).OnlyEnforceIf(y[(o.number, p.number, r)])
                              model.Add(start[p.number] >= start[o.number] + o.a_time).OnlyEnforceIf(y[(p.number, o.number, r)])
-                             model.Add(y[(o.number, p.number, r)] + y[(p.number, o.number, r)] == 1).OnlyEnforceIf(x[(o.number, r)] and x[(p.number, r)])
+                             model.Add(y[(o.number, p.number, r)] + y[(p.number, o.number, r)] >= x[(o.number, r)] + x[(p.number, r)] - 1)
+                             model.Add(y[(o.number, p.number, r)] + y[(p.number, o.number, r)] <= x[(o.number, r)])
+                             model.Add(y[(o.number, p.number, r)] + y[(p.number, o.number, r)] <=  x[(p.number, r)])
                             
                             #model.add(y[(o.number, p.number, r)] == 0).OnlyEnforceIf(x[(o.number, r)].Not())
                             #model.add(y[(o.number, p.number, r)] == 0).OnlyEnforceIf(x[(p.number, r)].Not())
