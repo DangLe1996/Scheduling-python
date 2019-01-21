@@ -99,11 +99,13 @@ def MachineShopScheduling(all_orders):
     #        model.Add(all_tasks[job, task_id + 1].start >= all_tasks[job, task_id].end)
     
 
-def AssemblyScheduling(all_orders):
+def AssemblyScheduling(all_orders, useages):
 
        # Instantiate a cp model.
    
     horizon = sum(o.a_time for o in all_orders); 
+    
+    horizon = horizon + sum(value for key, value in useages.items())
     horizon =math.ceil(horizon )
     model = cp_model.CpModel()
     # Variables
@@ -141,8 +143,10 @@ def AssemblyScheduling(all_orders):
     for o in all_orders:
         try:
             model.Add(sum(x[(o.number, g)] for g in o.qualified_group) == 1) 
+            [model.Add(start[o.number] >= useages[g] *x[(o.number, g)] ) for g in o.qualified_group]
         except TypeError:
             model.Add(x[(o.number, o.qualified_group)]  == 1) 
+            #model.Add(start[o.number] >= useages[o.qualified_group] )
 
     for o in all_orders:
         for p in all_orders :
@@ -198,6 +202,18 @@ def AssemblyScheduling(all_orders):
     #print('  - conflicts : %i' % solver.NumConflicts())
     #print('  - branches  : %i' % solver.NumBranches())
     #print('  - wall time : %f s' % solver.WallTime())
+
+def best_fit(solution, useage):
+    for key, o in solution.items():
+        if(o.Status > 1):
+            if type(o.qualified_group) == list:
+                for g in o.qualified_group:
+                    if(g != o.group):
+                        if(useage[o.group] - useage[g] >= o.a_time):
+                            useage[o.group] -= o.a_time
+                            useage[g] += o.a_time
+                            o.group = g
+
 
 def assign_solution(solver, all_orders, start, x):
     for o in all_orders:
