@@ -1,5 +1,5 @@
 Deployment instruction: 
-1. Install python from https://www.python.org/downloads/
+1. Install python3 from https://www.python.org/downloads/
 - Allow python being added to PATH (if on Windows)
 2. Install the following packages: 
 - pip install pandas
