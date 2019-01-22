@@ -11,3 +11,6 @@ https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 - git clone https://github.com/DangLe1996/Scheduling-python.git  <directory>
   
 
+Update instruction: 
+Clone the new features using the following command:
+- git clone https://github.com/DangLe1996/Scheduling-python.git  <directory>
