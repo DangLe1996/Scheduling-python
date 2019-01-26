@@ -31,8 +31,8 @@ class sub_order():
         self.index = index
         self.tasks = {}
         self.sequence = []
-        self.start = []
-        self.finish = []
+        self.start = {}
+        self.finish = {}
      def update_time(self,attr, task_type):
         self.tasks[attr] = task_type
 
@@ -54,7 +54,7 @@ status_rank = {
 all_sections = []
 map_order = {}
 solution =[]
-
+solution_machining = []
 def map_oder_input(sub):
     if sub not in map_order[sub.Order].sections:
         if map_order[sub.Order].priority > priority_rank [getattr(sub,'Promised')] :
@@ -81,11 +81,11 @@ machine_status_dict = {
     }
 
 cnc_condition = ['CNC Holes', 'CNC MR', 'CNC Controls']
-
+sequence = ['saw', 'mill', 'punch', 'welding', 'body_a', 'lens']
 def read_data_machine(filename):
     SORT_ORDER = {}
    
-    sequence = ['saw', 'mill', 'punch', 'welding', 'body_a', 'lens']
+    
     for index, i in enumerate(sequence):
             SORT_ORDER[i] = index
     fields = ['Order', 'Line', 'Status', 'Scheduled Ship Date', 'SD vs BOM', 'Saw Cycle Time', 'Welding Cycle Time', 'Lens Cycle Time'
@@ -239,9 +239,21 @@ useage= {
     12: 0,
    
     }
+ 
+capacity_machine= {
+    'saw': 60,
+    'mill': 37,
+    'punch': 7.5,
+    'welding': 22.5, 
+    'body_a': 30,
+    'lens': 52
+   
+   
+    }
 def assign_date(assembly_orders,file_output, today):
         
     output = ['number', 'group', 'start_day', 'start', 'finish_day', 'finish', 'a_time', 'Status']
+    solution.sort(key = attrgetter('group', 'Status', 'priority' ), reverse=False)
     line = []
     useage_after = useage.fromkeys(useage, 0)
     for o in assembly_orders:
@@ -258,11 +270,48 @@ def assign_date(assembly_orders,file_output, today):
         line += "\n"
         line = ''.join(line)
     file_output.write(line)
+    print('After heuristic')
     print(useage_after)
 
+def assign_date_machining(solution,file_output, today):
+        
+    output = ['number', 'Status']
+    output.extend(sequence)
+    line = []
+    useage_after = useage.fromkeys(capacity_machine, 0)
+    for o in solution:
+        for s in o.sections:
+            line += str( o.number)
+            line += ','
+            line += str( s.Line)
+            line += ','
+            line += str( o.status)
+            line += ','
+            for attr in sequence:
+                try:
+                    if getattr(s,attr) > 0:
+                        line +=  str(today + timedelta( days = math.floor(s.start[attr]/ (60*7*3))))
+                        line += ','
+                        line += str(s.start[attr])
+                        line += ','
+                    else:
+                        line += '-'
+                        line += ','
+                        line += '-'
+                        line += ','
+                except AttributeError:
+                        line += '-'
+                        line += ','
+                        line += '-'
+                        line += ','
+            line += "\n"
+    line = ''.join(line)
+    file_output.write(line)
+
+    
 
 def assign_date_pre(assembly_orders):
-        
+    
     output = ['number', 'group', 'start_day', 'start', 'finish_day', 'finish', 'a_time', 'Status']
     for o in assembly_orders:
         assembly_orders.sort(key = attrgetter('group', 'start'), reverse=False)
@@ -274,23 +323,24 @@ def assign_date_pre(assembly_orders):
             
         solution.append( o)
         useage[o.group] = useage[o.group] +  o.a_time
-    
+   
+
 
 
 
 def generate_machining_schedule():
     maching_orders = []
-    for i in range(4,5):
-        count = 0
+    for i in range(3,5):
+        
         for keys, values in map_order.items():
             if values.status == i:
                 maching_orders.append(values)
-                count = count + 1
-                if count == 2:
-                    break 
-        MachineShopScheduling(maching_orders)
-        maching_orders.clear()
-        print('finish')
+    print("Number of Order to machine are: {}".format( len(maching_orders)))
+    MachineShopScheduling(maching_orders)
+    solution_machining.extend( maching_orders)
+    maching_orders.clear()
+    
+
 
 
     
@@ -318,36 +368,57 @@ def generate_assembly_schedule(f):
             AssemblyScheduling(assembly_orders, useage)
             assign_date_pre(assembly_orders)
         assembly_orders.clear()
-    print("fnish")
 
 
 
 
 def main():
-    try:
-        ofile= open("output.csv","w")
-        ofile.write('Order, Assigned Group, Start Date, Start Time, Finish day, Finish time, Assembly Time, Status \n')
-    except PermissionError:
-        print('Please close the file output.csv and return the program')
-        ans = input("Press any button to exit")
-        exit()
+    
     
     while(1):
         choice = input("Please enter 1 for assembly and 2 for machine shop scheduling:  ")
-        date_entry = input('Enter a date in DD/MM/YYYY format')
+        date_entry = input('Enter a date in DD/MM/YYYY format: ')
         today = datetime.strptime( date_entry,"%d/%m/%Y" )
         if choice == '1':
+            try:
+                ofile= open("assembly output.csv","w")
+                ofile.write('Order, Assigned Group, Start Date, Start Time, Finish day, Finish time, Assembly Time, Status \n')
+            except PermissionError:
+                print('Please close the file output.csv and return the program')
+                ans = input("Press any button to exit")
+                exit()
             filename = input("Please enter assembly input file name in .csv format:  ")
-            if read_data_assembly('test1.csv'):
+            if read_data_assembly(filename):
                 generate_assembly_schedule(ofile)
+                print('Before Heuristic')
                 print(useage)
+                #assign_date(solution,ofile, today)
                 best_fit(solution, useage)
                 assign_date(solution,ofile, today)
             break
         elif choice == '2':
-            filename = input("Please enter assembly input file name in .csv format:  ")
+            try:
+                seq = ['Saw', 'Mill', 'Punch', 'Welding', 'Body Assemly', 'Lens']
+                ofile= open("machining output.csv","w")
+                line = ['Order,Line , Status,']
+                for i in sequence:
+                    line += i
+                    line += ' Date '
+                    line += ','
+                    line += i
+                    line += ' Time '
+                    line += ','
+                line +='\n'
+                line = ''.join(line)
+                ofile.write(line)
+            except PermissionError:
+                print('Please close the file output.csv and return the program')
+                ans = input("Press any button to exit")
+                exit()
+            filename = input("Please enter assembly input file name in .csv format: ")
             read_data_machine(filename)
-            generate_machining_schedule()           
+            generate_machining_schedule()    
+            assign_date_machining(solution_machining,ofile, today)
             break
         else: print("Wrong choice, please enter 1 or 2 only")
 
