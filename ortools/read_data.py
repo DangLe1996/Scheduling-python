@@ -140,7 +140,8 @@ def read_data_machine(filename):
         map_oder_input_machinig(sub)
         index = index + 1
         
-    print('finish')
+    print('File input sucessfully')
+    return 1
 
 
 
@@ -216,7 +217,7 @@ def read_data_assembly(filename):
                     bad_orders.remove(row['Order'])
                 else: 
                     bad_orders.append(row['Order'])
-   
+    print('File input sucessfully')
     return 1
 
     
@@ -416,10 +417,10 @@ def main():
                 ans = input("Press any button to exit")
                 exit()
             filename = input("Please enter assembly input file name in .csv format: ")
-            read_data_machine(filename)
-            generate_machining_schedule()    
-            assign_date_machining(solution_machining,ofile, today)
-            break
+            if read_data_machine(filename):
+                generate_machining_schedule()    
+                assign_date_machining(solution_machining,ofile, today)
+                break
         else: print("Wrong choice, please enter 1 or 2 only")
 
 if __name__ == "__main__":
