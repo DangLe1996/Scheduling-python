@@ -8,15 +8,20 @@ Created on Mon Dec 31 14:20:26 2018
 from __future__ import print_function
 import pandas as pd
 import collections
-
+import math
+from operator import attrgetter
+from operator import itemgetter
 
 # Import Python wrapper for or-tools CP-SAT solver.
 from ortools.sat.python import cp_model
 
 def MachineShopScheduling(all_orders):
     #not_used = ['section', 'order_number','final_a',   'tasks', 'task_type']
-    sequence = ['mill', 'punch', 'welding', 'house_a', 'lens_cut', 'lens_a', 'manu']
-    allowed_status = ['Machine Shop Started', 'Machine Shop Not Started']
+    sequence = ['saw', 'mill', 'punch', 'welding', 'body_a', 'lens']
+    #for i in range(len(sequence)):
+    #    sequence[i] = sequence[i]  + '_total_time'
+    #allowed_status = ['Machine Shop Started', 'Scheduled/Released']
+ 
     #Create the model
     model = cp_model.CpModel()
     machine_count = len(sequence)
@@ -24,43 +29,53 @@ def MachineShopScheduling(all_orders):
     
     #Compute horizon
     horizon = sum(int(value) for o in all_orders for s in o.sections for attr, value in s.__dict__.items() 
-                  if attr in sequence and o.status in allowed_status)
+                  if attr in sequence  )
+    horizon = horizon * 10
+
+
     if(horizon > 0):
+        print("Horizon = " + str(horizon))
         task_type = collections.namedtuple('task_type', 'start end interval')
         for o in all_orders:
-            if(o.status in allowed_status):
-                for s in o.sections:
-                    for task_id, attr in enumerate(sequence):
-                             start_var = model.NewIntVar(0,horizon,'start_%i_%i_%i' %(o.number,s.section, task_id))
-                             duration = getattr(s,attr)
-                             end_var = model.NewIntVar(0,horizon,'end_%i_%i_%i' %(o.number,s.section, task_id))
-                             interval_var = model.NewIntervalVar(start_var,duration,end_var,'interval_%i_%i_%i'%(o.number,s.section,task_id))  
-                             s.update_time(attr,task_type(start = start_var,  end = end_var, interval = interval_var))
+            for s in o.sections:
+                for task_id, attr in enumerate(sequence):
+                    try:
+                        if getattr(s,attr) > 0:
+                                start_var = model.NewIntVar(0,horizon,'start_%i_%i_%i' %(o.number,s.Line, task_id))
+                                duration = math.ceil (getattr(s,attr))
+                                end_var = model.NewIntVar(0,horizon,'end_%i_%i_%i' %(o.number,s.Line, task_id))
+                                interval_var = model.NewIntervalVar(start_var,duration,end_var,'interval_%i_%i_%i'%(o.number,s.Line,task_id))  
+                                s.update_time(attr,task_type(start = start_var,  end = end_var, interval = interval_var))
+                    except AttributeError:
+                                pass
 
     
          #create and add disjunctive constraints
+       
         count = 0
         for task_id, attr in enumerate(sequence): #enumerator
                 intervals = []
                 for o in all_orders:
-                    if(o.status in allowed_status):
-                        for s in o.sections:
-                            intervals.append(s.tasks[attr].interval)
-                            for i in range(machine_count-1):
-                                count += 1
-                                #add precedent constraint
-                                model.Add(s.tasks[sequence[i + 1]].start >= s.tasks[sequence[i]].end)
-                #add nonoverlapping constraint for each machine. 
-                count += 1
+                    for s in o.sections:
+                        try:
+                            if getattr(s,attr) > 0:
+                                intervals.append(s.tasks[attr].interval)
+                        except AttributeError:
+                                pass
                 model.AddNoOverlap(intervals)
-        print('Number of precedent const is ' + str(count))
 
+        #precedent constraint
+        for o in all_orders:
+                for s in o.sections:
+                    for i in range(len(s.sequence) - 1):
+                            model.Add(s.tasks[sequence[s.sequence[i+1]]].start >= s.tasks[sequence[s.sequence[i]]].end)
 
+       
       
 
          #makespan objective
-        obj_var = model.NewIntVar(0,horizon,'makespan')
-        model.AddMaxEquality(obj_var,[s.tasks[sequence[-1]].end for o in all_orders for s in o.sections if o.status in allowed_status])
+        obj_var = model.NewIntVar(0,horizon,'makespan')       
+        model.AddMaxEquality(obj_var,[s.tasks[sequence[attr]].end for o in all_orders for s in o.sections for attr in s.sequence ])    
         model.Minimize(obj_var)
 
         solver = cp_model.CpSolver()
@@ -70,16 +85,26 @@ def MachineShopScheduling(all_orders):
 
         if status == cp_model.FEASIBLE:
             print('Feasible Schedule Length: %i' % solver.ObjectiveValue())
-        #    print()
+            print('Number of Branches explored: %i' %solver.NumBranches())
+            print()
         for o in all_orders:
-            if o.status in allowed_status:
-                for s in o.sections:
-                    for i in range(machine_count):
-                        s.start.append(solver.Value(s.tasks[sequence[i ]].start))
-                        s.finish.append(solver.Value(s.tasks[sequence[i ]].end))
+            for s in o.sections:
+                for i in s.sequence:
+                    s.start[sequence[i]] =solver.Value(s.tasks[sequence[i]].start)
+                    s.finish[sequence[i]] =solver.Value(s.tasks[sequence[i]].end)
+                       
+                    
         if status == cp_model.OPTIMAL:
             # Print out makespan.
             print('Optimal Schedule Length: %i' % solver.ObjectiveValue())
+            print()
+        if status == cp_model.INFEASIBLE:
+            # Print out makespan.
+            print('infeasible')
+            print()
+        if status == cp_model.MODEL_INVALID:
+            # Print out makespan.
+            print('invalid')
             print()
         return 1
     else: 
@@ -90,269 +115,149 @@ def MachineShopScheduling(all_orders):
     #        model.Add(all_tasks[job, task_id + 1].start >= all_tasks[job, task_id].end)
     
 
+def AssemblyScheduling(all_orders, useages):
 
-  
-
-
-def MinimalJobshopSat(jobs_data, all_orders):
-    #Create the model
+       # Instantiate a cp model.
+   
+    horizon = sum(o.a_time for o in all_orders); 
+    
+    horizon = horizon + sum(value for key, value in useages.items())
+    horizon =math.ceil(horizon )
     model = cp_model.CpModel()
-    machine_count = 7
-    all_machines = range(machine_count)
-    #jobs_count = len(jobs_data) #count how many jobs there is
-    jobs_count = len(jobs_data) #count how many jobs there is
-    all_jobs = range(jobs_count)
-
-    #Compute horizon
-    horizon = sum(task[1]  for job in jobs_data for task in job)
-    print(horizon)
-
-    #data type container
-    #create a namedtuple that name task_type with three input parameter of start, end and interval.
-    task_type = collections.namedtuple('task_type', 'start end interval')
-    assembly_type = collections.namedtuple('assembly_type', 'start end interval')
-    #similar to the one above, with three variables of start, job and index. 
-    #assigned task type is used to store solution. Not needed to define the problem. 
-    assigned_task_type = collections.namedtuple('assigned_task_type', 'start job index')
-
-    #orders = {}
-    #for o in all_orders:
-    #    order = []
-    #    start_assembly_var = model.NewIntVar(0,horizon, 'start_assembly_%i' %(o))
-    #    duration = o.a_time
-    #    end_assembly_var = model.NewIntVar(0,horizon, 'end_assembly_%i' %(o))
-    #    orders[o.number] = assembly_type(start_assembly_var,
-    #                                                  duration, end_assembly_var)
-
-    #create jobs
-    all_tasks = {} #dictionary
-    for job in all_jobs:
-        for task_id, task in enumerate(jobs_data[job]): #enumerator
-            start_var = model.NewIntVar(0,horizon,'start_%i_%i' %(job, task_id))
-            duration = task[1]
-            end_var = model.NewIntVar(0,horizon,'end_%i_%i' %(job, task_id))
-            interval_var = model.NewIntervalVar(start_var,duration,end_var,'interval_%i_%i'%(job,task_id))
-            #use job and task_id to create a dictionary
-            all_tasks[job,task_id] = task_type(start = start_var, end = end_var, interval = interval_var)
-    #create assembly constraint
-
-     #for o in all_orders:
-     #    for s in o.sections:
-     #        model.Add(orders[o.number].start_assembly_var >=  )
+    # Variables
+    makespan = model.NewIntVar(0, horizon, 'makespan')
+    x = {}
+    start= {}
+    y = {}
+    inter = []
+    for o in all_orders:
+        t = []
+        for p in all_orders :
+            if p.number !=  o.number:
+                try:
+                    inter = intersection(o.qualified_group, p.qualified_group)
+                    if(len(inter) > 0):
+                        for r in inter:
+                            y[(o.number, p.number, r)] = model.NewBoolVar('y[%i,%i, %i]' % (o.number, p.number, r))
+                except TypeError:
+                    if o.qualified_group ==  p.qualified_group :
+                        inter = o.qualified_group
+                        y[(o.number, p.number, inter)] = model.NewBoolVar('y[%i,%i, %i]' % (o.number, p.number, inter))
+        try:       
+            for g in o.qualified_group: 
+                x[(o.number,g)] = model.NewBoolVar('x[%i,%i]' % (o.number, g))
+            start[o.number] = model.NewIntVar(0,horizon,'start[%i]' % o.number)
+        except TypeError:
+            g = o.qualified_group
+            x[(o.number,g)] = model.NewBoolVar('x[%i,%i]' % (o.number, g))
+            start[o.number] = model.NewIntVar(0,horizon,'start[%i]' % o.number)
 
 
-    #create and add disjunctive constraints
-    count = 0
-    for machine in all_machines:
-        intervals = []
-        for job in all_jobs:
-            #for task_id, task in enumerate(jobs_data[job]):
-            #    if task[0] == machine:
-                    intervals.append(all_tasks[job,machine].interval)
-        #add nonoverlapping constraint for each machine. 
-        count +=1
-        model.AddNoOverlap(intervals)
-    print('Number of precedent const is ' + str(count))
+    ## Constraints
 
+    # Each task is assigned one qualified group.
+    for o in all_orders:
+        try:
+            model.Add(sum(x[(o.number, g)] for g in o.qualified_group) == 1) 
+            [model.Add(start[o.number] >= useages[g] *x[(o.number, g)] ) for g in o.qualified_group]
+        except TypeError:
+            model.Add(x[(o.number, o.qualified_group)]  == 1) 
+            #model.Add(start[o.number] >= useages[o.qualified_group] )
 
-    count = 0
-    #Add precedent constraint
-    for job in all_jobs:
-        for task_id in range(0,len(jobs_data[job]) -1 ):
-            count +=1
-            model.Add(all_tasks[job, task_id + 1].start >= all_tasks[job, task_id].end)
-    print('Number of const is ' + str(count))
+    for o in all_orders:
+        for p in all_orders :
+            if p.number > o.number:
+                try:
+                    inter = intersection(o.qualified_group, p.qualified_group)
+                    if(len(inter) > 0):
+                        for r in inter:
+                             model.Add(start[o.number] >= start[p.number] + p.a_time).OnlyEnforceIf(y[(o.number, p.number, r)])
+                             model.Add(start[p.number] >= start[o.number] + o.a_time).OnlyEnforceIf(y[(p.number, o.number, r)])
+                             model.Add(y[(o.number, p.number, r)] + y[(p.number, o.number, r)] >= x[(o.number, r)] + x[(p.number, r)] - 1)
+                             model.Add(y[(o.number, p.number, r)] + y[(p.number, o.number, r)] <= x[(o.number, r)])
+                             model.Add(y[(o.number, p.number, r)] + y[(p.number, o.number, r)] <=  x[(p.number, r)])
+                            
+                            #model.add(y[(o.number, p.number, r)] == 0).OnlyEnforceIf(x[(o.number, r)].Not())
+                            #model.add(y[(o.number, p.number, r)] == 0).OnlyEnforceIf(x[(p.number, r)].Not())
+                           
+                            #model.Add(y[(o.number, p.number, r)] + y[(o.number, p.number, r)] == 1).OnlyEnforceIf(x[(o.number, r)] and x[(p.number, r)])
+                except TypeError:
+                    if o.qualified_group ==  p.qualified_group :
+                        r = o.qualified_group
+                        model.Add(start[o.number] >= start[p.number] + p.a_time).OnlyEnforceIf(x[(o.number, r)] and x[(p.number, r)] and y[(o.number, p.number, r)])
+                        model.Add(start[p.number] >= start[o.number] + o.a_time).OnlyEnforceIf(x[(o.number, r)] and x[(p.number, r)] and y[(o.number, p.number, r)].Not())
 
+    ## Total task size for each worker is at most total_size_max
+    ##for i in all_workers:
+    ##    model.Add(sum(sizes[j] * x[i][j] for j in all_tasks) <= total_size_max)
 
-    #makespan objective
-    obj_var = model.NewIntVar(0,horizon,'makespan')
-    model.AddMaxEquality(obj_var,[all_tasks[(job,len(jobs_data[job]) - 1)].end for job in all_jobs])
-    model.Minimize(obj_var)
+    ## Total cost
+    [model.Add(makespan >= start[o.number] + o.a_time)  for o in all_orders]
+    model.Minimize(makespan)
 
-    #solve_model
-
-   
     solver = cp_model.CpSolver()
-    solver.parameters.max_time_in_seconds = 30.0
-    #status = solver.Solve(model)
-    status = 0
-    assigned_task_type = collections.namedtuple('assigned_task_type', 'start job index')
-
+    solver.parameters.max_time_in_seconds = 5.0
+    status = solver.Solve(model)
+    print('Status is ', solver.StatusName(status))
     if status == cp_model.FEASIBLE:
-
-        print('feasible schedule length: %i' % solver.ObjectiveValue())
-        print()
-         # Create one list of assigned tasks per machine.
-        assigned_jobs = [[] for _ in all_machines]
-        for job in all_jobs:
-            for task_id, task in enumerate(jobs_data[job]):
-                machine = task[0]
-                assigned_jobs[machine].append(
-                    assigned_task_type(
-                        start=solver.Value(all_tasks[job, task_id].start),
-                        job=job,
-                        index=task_id))
-
-        disp_col_width = 10
-        sol_line = ''
-        sol_line_tasks = ''
-
-        print('Feasible Schedule', '\n')
-
-        for machine in all_machines:
-            # Sort by starting time.
-            assigned_jobs[machine].sort()
-            sol_line += 'Machine ' + str(machine) + ': '
-            sol_line_tasks += 'Machine ' + str(machine) + ': '
-
-            for assigned_task in assigned_jobs[machine]:
-                name = 'job_%i_%i' % (assigned_task.job, assigned_task.index)
-                # Add spaces to output to align columns.
-                sol_line_tasks += name + ' ' * (disp_col_width - len(name))
-                start = assigned_task.start
-                duration = jobs_data[assigned_task.job][assigned_task.index][1]
-
-                sol_tmp = '[%i,%i]' % (start, start + duration)
-                # Add spaces to output to align columns.
-                sol_line += sol_tmp + ' ' * (disp_col_width - len(sol_tmp))
-
-            sol_line += '\n'
-            sol_line_tasks += '\n'
-
-        print(sol_line_tasks)
-        print('Task Time Intervals\n')
-        print(sol_line)
-
+        print('Feasible sol = %i' % solver.ObjectiveValue())
+        assign_solution(solver, all_orders, start, x)
     if status == cp_model.OPTIMAL:
-        # Print out makespan.
-        print('Optimal Schedule Length: %i' % solver.ObjectiveValue())
-    #    print()
+        print('Optimal sol = %i' % solver.ObjectiveValue())
+        assign_solution(solver,all_orders, start, x)
+        #print()
+        #for i in all_workers:
+        #    for j in all_tasks:
+        #        if solver.Value(x[i][j]) == 1:
+        #            print('Worker ', i, ' assigned to task ', j, '  Cost = ',
+        #                  cost[i][j])
+
+        #print()
+
+    #print('Statistics')
+    #print('  - conflicts : %i' % solver.NumConflicts())
+    #print('  - branches  : %i' % solver.NumBranches())
+    #print('  - wall time : %f s' % solver.WallTime())
+
+def best_fit(solution, useage):
+    for  o in solution:
+        if(o.Status > 1):
+            if type(o.qualified_group) == list:
+                for g in o.qualified_group:
+                    if(g != o.group):
+                        if(useage[o.group] - useage[g] >= o.a_time):
+                            useage[o.group] -= o.a_time
+                            useage[g] += o.a_time
+                            o.group = g
+    #sorted(solution.values(), key=attrgetter('group', 'Status'))
+    #sorted(solution.items(), key=attrgetter('group'), reverse=True) 
+ 
+    #solution.values().sort(key =attrgetter('group', 'Status'))
+    print('finish')
 
 
-#def MinimalJobshopSat():
-#    """Minimal jobshop problem."""
-#    # Create the model.
-#    model = cp_model.CpModel()
 
-   
-#    #jobs_data = [  # task = (machine_id, processing_time).
-#    #    [(0, 3), (1, 2), (2, 2)],  # Job0
-#    #    [(0, 2), (2, 1), (1, 7)],  # Job1
-#    #    [(0, 2), (2, 1), (1, 4)],  # Job1
-#    #    [(0, 2), (2, 1), (1, 4)],  # Job1
-#    #    [(0,6), (2, 5), (1, 4)],  # Job1
-#    #    [(0, 2), (2, 3), (1, 4)],  # Job1
-#    #    [(0, 2), (2, 5), (1, 6)],  # Job1
-#    #    [(0, 2), (2, 1), (1, 4)],  # Job1
-#    #    [(0, 2), (2, 6), (1, 3)],  # Job1
-#    #    [(0, 9), (2, 1), (1, 4)],  # Job1
-#    #    [(1, 4), (2, 3)]  # Job2
-#    #]
 
-#    machines_count = 1 + max(task[0] for job in jobs_data for task in job)
-#    #for job in jobs_data:
-#    #    for task in job:
-#    #        print(task[0])
+def assign_solution(solver, all_orders, start, x):
+    for o in all_orders:
+            setattr(o, 'start', solver.Value(start[o.number]))
+            setattr(o, 'finish', o.start + o.a_time)
+            try:
+                for g in o.qualified_group:
+                    if solver.Value(x[(o.number,g)]) == 1:
+                        setattr(o, 'group', g)
+            except TypeError: 
+                setattr(o, 'group', o.qualified_group)
+
+
   
+def common_member(a, b): 
+    a_set = set(a) 
+    b_set = set(b) 
+    if (a_set & b_set): 
+        return True 
+    else: 
+        return False
 
-#    all_machines = range(machines_count)
-#    jobs_count = len(jobs_data)
-#    all_jobs = range(jobs_count)
-
-#    # Compute horizon.
-#    horizon = sum(task[1] for job in jobs_data for task in job)
-
-#    task_type = collections.namedtuple('task_type', 'start end interval')
-#    assigned_task_type = collections.namedtuple('assigned_task_type',
-#                                                'start job index')
-
-#    # Create jobs.
-#    all_tasks = {}
-#    for job in all_jobs:
-#        for task_id, task in enumerate(jobs_data[job]):
-#            start_var = model.NewIntVar(0, horizon,
-#                                        'start_%i_%i' % (job, task_id))
-#            duration = task[1]
-#            end_var = model.NewIntVar(0, horizon, 'end_%i_%i' % (job, task_id))
-#            interval_var = model.NewIntervalVar(
-#                start_var, duration, end_var, 'interval_%i_%i' % (job, task_id))
-#            all_tasks[job, task_id] = task_type(
-#                start=start_var, end=end_var, interval=interval_var)
-
-#    # Create and add disjunctive constraints.
-#    for machine in all_machines:
-#        intervals = []
-#        for job in all_jobs:
-#            for task_id, task in enumerate(jobs_data[job]):
-#                if task[0] == machine:
-#                    intervals.append(all_tasks[job, task_id].interval)
-#        model.AddNoOverlap(intervals)
-
-#    # Add precedence contraints.
-#    for job in all_jobs:
-#        for task_id in range(0, len(jobs_data[job]) - 1):
-#            model.Add(all_tasks[job, task_id +
-#                                1].start >= all_tasks[job, task_id].end)
-
-#    # Makespan objective.
-#    obj_var = model.NewIntVar(0, horizon, 'makespan')
-#    model.AddMaxEquality(
-#        obj_var,
-#        [all_tasks[(job, len(jobs_data[job]) - 1)].end for job in all_jobs])
-#    model.Minimize(obj_var)
-
-#    # Solve model.
-#    solver = cp_model.CpSolver()
-#    status = solver.Solve(model)
-
-#    if status == cp_model.OPTIMAL:
-#        # Print out makespan.
-#        print('Optimal Schedule Length: %i' % solver.ObjectiveValue())
-#        print()
-
-#        # Create one list of assigned tasks per machine.
-#        assigned_jobs = [[] for _ in all_machines]
-#        for job in all_jobs:
-#            for task_id, task in enumerate(jobs_data[job]):
-#                machine = task[0]
-#                assigned_jobs[machine].append(
-#                    assigned_task_type(
-#                        start=solver.Value(all_tasks[job, task_id].start),
-#                        job=job,
-#                        index=task_id))
-
-#        disp_col_width = 10
-#        sol_line = ''
-#        sol_line_tasks = ''
-
-#        print('Optimal Schedule', '\n')
-
-#        for machine in all_machines:
-#            # Sort by starting time.
-#            assigned_jobs[machine].sort()
-#            sol_line += 'Machine ' + str(machine) + ': '
-#            sol_line_tasks += 'Machine ' + str(machine) + ': '
-
-#            for assigned_task in assigned_jobs[machine]:
-#                name = 'job_%i_%i' % (assigned_task.job, assigned_task.index)
-#                # Add spaces to output to align columns.
-#                sol_line_tasks += name + ' ' * (disp_col_width - len(name))
-#                start = assigned_task.start
-#                duration = jobs_data[assigned_task.job][assigned_task.index][1]
-
-#                sol_tmp = '[%i,%i]' % (start, start + duration)
-#                # Add spaces to output to align columns.
-#                sol_line += sol_tmp + ' ' * (disp_col_width - len(sol_tmp))
-
-#            sol_line += '\n'
-#            sol_line_tasks += '\n'
-
-#        print(sol_line_tasks)
-#        print('Task Time Intervals\n')
-#        print(sol_line)
-
-
-
-
-
-
+def intersection(lst1, lst2): 
+    return list(set(lst1) & set(lst2))
