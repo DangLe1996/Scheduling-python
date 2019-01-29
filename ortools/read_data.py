@@ -23,7 +23,7 @@ class order():
         self.finish = finish
    
 
-class sub_order():
+class sub_order(order):
   
      def __init__(self, index ):
         #self.order_number = order_number
@@ -33,6 +33,7 @@ class sub_order():
         self.sequence = []
         self.start = {}
         self.finish = {}
+
      def update_time(self,attr, task_type):
         self.tasks[attr] = task_type
 
@@ -56,12 +57,12 @@ map_order = {}
 solution =[]
 solution_machining = []
 def map_oder_input(sub):
-    if sub not in map_order[sub.Order].sections:
-        if map_order[sub.Order].priority > priority_rank [getattr(sub,'Promised')] :
-            map_order[sub.Order].priority = priority_rank [getattr(sub,'Promised')]
-        map_order[sub.Order].add_section(sub)
+    if sub not in map_order[sub.ID].sections:
+        if map_order[sub.ID].priority > priority_rank [getattr(sub,'Promised')] :
+            map_order[sub.ID].priority = priority_rank [getattr(sub,'Promised')]
+        map_order[sub.ID].add_section(sub)
         try:
-            map_order[sub.Order].a_time += math.ceil(getattr(sub,'Real Time'))
+            map_order[sub.ID].a_time += math.ceil(getattr(sub,'Real Time'))
         except TypeError or ValueError :
              pass
 
@@ -148,12 +149,12 @@ def read_data_machine(filename):
 
 
 
-def read_data_assembly(filename):
+def read_data_assembly(filename, today):
 
     
 #order_input = pd.read_csv('order_input.csv')
     fields = ['Order', 'Line', 'Status', 'Sched. Ship Date',
-             'Real Status' , 'Real Time', 'Promised' , 'ISSUE','Missing Materials', 'Production Group', 'Production Group' ]
+             'Real Status' , 'Real Time', 'Promised' , 'ISSUE','Missing Materials', 'Production Group' ]
     #section_input = pd.read_csv("Axis-Assembly-Input.csv", skiprows = 1)
     try:
         assembly_input = pd.read_csv(filename, skipinitialspace=True, usecols=fields)
@@ -180,34 +181,47 @@ def read_data_assembly(filename):
     for index, row in assembly_input.iterrows():
         if row['Order'] not in bad_orders:
             if(row['Status'] in status_rank and row['ISSUE'] in good_value):
-                if(row['Order'] not in map_order):
-                    ord = order(row['Order'])
-                    setattr(ord, 'priority', 5)
-                    map_order[row['Order']] = ord
+                
                 sub = sub_order(index)
             
                 for value in fields:
                     setattr(sub, value, row[value])
                 setattr(sub, 'priority', priority_rank[sub.Promised])
-     
+                formatter_string = "%d.%m.%Y" 
+                datetime_object = datetime.strptime(getattr(sub,'Sched. Ship Date'), formatter_string)
+                setattr(sub,'ship_date', datetime_object.date())
+                setattr(sub,'delta', (datetime_object - today).days)
+                value = [0,(datetime_object - today).days]
+                ID = int(str(row['Order']) + str(max(value)))
+                if(ID not in map_order):
+                    ord = order(ID)
+                    setattr(ord, 'priority', 5)
+                    map_order[ID] = ord
+                setattr(sub,'ID', ID )
+                setattr(sub, 'group', getattr(sub,'Production Group'))
                 if status_rank[sub.Status] == 1 :
                     sub.Status = 1
                 elif status_rank[sub.Status] == 2:
                     try:
                         if math.isnan(getattr(sub,'Missing Materials')):
-                            sub.Status = 2   
+                            sub.Status = 2  
+                            
                         elif getattr(sub,'Missing Materials') == '=+Cartridge':
                             sub.Status = 3
+
                         else :sub.Status = 7
                     except TypeError:
                         sub.Status = 7
                 elif status_rank[sub.Status] == 3:
                     if getattr(sub,'Missing Materials') == '=+lens':
-                        sub.Status = 4     
+                        sub.Status = 4   
+                        
                     if getattr(sub,'Missing Materials') == 'Material+Cartridge':
                         sub.Status = 5  
+                        
                     if getattr(sub,'Missing Materials') == 'Material+lens+Cartridge+Housing':
                         sub.Status = 6
+                        
                     else :sub.Status = 7
                 else :sub.Status = 7
                 if int(sub.Status) :
@@ -217,6 +231,17 @@ def read_data_assembly(filename):
                     bad_orders.remove(row['Order'])
                 else: 
                     bad_orders.append(row['Order'])
+    for index, ord in map_order.items():
+              num = []
+              [num.append(s.Status) for s in ord.sections]
+              pri = []
+              [pri.append(s.priority) for s in ord.sections]
+              setattr(ord, 'Status', max(num))
+              setattr(ord, 'delta', ord.sections[0].delta)
+              setattr(ord, 'priority', min(pri))
+              if ord.Status < 7:
+                setattr(ord, 'group', ord.sections[0].group)
+                solution.append(ord)
     print('File input sucessfully')
     return 1
 
@@ -227,7 +252,8 @@ capacity = {
     7: 21,
     10: 14, 
     12: 14,
-   
+    15:14, 
+    18:14
 
     
 }
@@ -238,7 +264,8 @@ useage= {
     7: 0,
     10: 0, 
     12: 0,
-   
+    15:0, 
+    18:0
     }
  
 capacity_machine= {
@@ -253,8 +280,9 @@ capacity_machine= {
     }
 def assign_date(assembly_orders,file_output, today):
         
-    output = ['number', 'group', 'start_day', 'start', 'finish_day', 'finish', 'a_time', 'Status', 'Ship Date', 'Line']
-    solution.sort(key = attrgetter('group', 'Status', 'priority' ), reverse=False)
+    output = ['Order', 'Line', 'group','start_day', 'finish_day', 'ship_date', 'Real Time', 'Status']
+    #output_order = ['start_day', 'finish_day']
+    solution.sort(key = attrgetter('group', 'Status','delta', 'priority' ), reverse=False)
     line = []
     useage_after = useage.fromkeys(useage, 0)
     for o in assembly_orders:
@@ -265,13 +293,16 @@ def assign_date(assembly_orders,file_output, today):
         o.start_day = today + timedelta(days=o.start_day)  
         setattr(o, 'finish_day', math.floor((o.finish)/ (60*capacity[o.group])) )
         o.finish_day = today + timedelta(days=o.finish_day)
-        for i in output:
-            line += str(getattr(o,i))
-            line += ","   
-        line += "\n"
-        line = ''.join(line)
+        for s in o.sections:
+            s.start_day = o.start_day
+            s.finish_day = o.finish_day
+            for i in output:
+                line += str(getattr(s,i))
+                line += ","   
+            line += "\n"
+            line = ''.join(line)
     file_output.write(line)
-    print('After heuristic')
+    #print('After heuristic')
     print(useage_after)
 
 def assign_date_machining(solution,file_output, today):
@@ -309,8 +340,6 @@ def assign_date_machining(solution,file_output, today):
     line = ''.join(line)
     file_output.write(line)
 
-    
-
 def assign_date_pre(assembly_orders):
     
     output = ['number', 'group', 'start_day', 'start', 'finish_day', 'finish', 'a_time', 'Status']
@@ -325,10 +354,6 @@ def assign_date_pre(assembly_orders):
         solution.append( o)
         useage[o.group] = useage[o.group] +  o.a_time
    
-
-
-
-
 def generate_machining_schedule():
     maching_orders = []
     for i in range(3,5):
@@ -341,12 +366,7 @@ def generate_machining_schedule():
     solution_machining.extend( maching_orders)
     maching_orders.clear()
     
-
-
-
-    
-     
-       
+      
 
 def generate_assembly_schedule(f):
     assembly_orders = []
@@ -370,58 +390,66 @@ def generate_assembly_schedule(f):
             assign_date_pre(assembly_orders)
         assembly_orders.clear()
 
-
-
-
 def main():
+    date_entry = input('Enter a date in DD/MM/YYYY format: ')
+    today = datetime.strptime( date_entry,"%d/%m/%Y" )
+    try:
+        ofile= open("assembly output.csv","w")
+        ofile.write('Order, Line, Assigned Group, Start Date, Finish day, Ship day, Assembly Time, Status \n')
+    except PermissionError:
+        print('Please close the file output.csv and return the program')
+        ans = input("Press any button to exit")
+        exit()
+    filename = input("Please enter assembly input file name in .csv format:  ")
+    if read_data_assembly(filename, today):
+        assign_date(solution,ofile, today)
     
-    
-    while(1):
-        choice = input("Please enter 1 for assembly and 2 for machine shop scheduling:  ")
-        date_entry = input('Enter a date in DD/MM/YYYY format: ')
-        today = datetime.strptime( date_entry,"%d/%m/%Y" )
-        if choice == '1':
-            try:
-                ofile= open("assembly output.csv","w")
-                ofile.write('Order, Assigned Group, Start Date, Start Time, Finish day, Finish time, Assembly Time, Status \n')
-            except PermissionError:
-                print('Please close the file output.csv and return the program')
-                ans = input("Press any button to exit")
-                exit()
-            filename = input("Please enter assembly input file name in .csv format:  ")
-            if read_data_assembly(filename):
-                generate_assembly_schedule(ofile)
-                print('Before Heuristic')
-                print(useage)
-                #assign_date(solution,ofile, today)
-                best_fit(solution, useage)
-                assign_date(solution,ofile, today)
-            break
-        elif choice == '2':
-            try:
-                seq = ['Saw', 'Mill', 'Punch', 'Welding', 'Body Assemly', 'Lens']
-                ofile= open("machining output.csv","w")
-                line = ['Order,Line , Status,']
-                for i in sequence:
-                    line += i
-                    line += ' Date '
-                    line += ','
-                    line += i
-                    line += ' Time '
-                    line += ','
-                line +='\n'
-                line = ''.join(line)
-                ofile.write(line)
-            except PermissionError:
-                print('Please close the file output.csv and return the program')
-                ans = input("Press any button to exit")
-                exit()
-            filename = input("Please enter assembly input file name in .csv format: ")
-            if read_data_machine(filename):
-                generate_machining_schedule()    
-                assign_date_machining(solution_machining,ofile, today)
-                break
-        else: print("Wrong choice, please enter 1 or 2 only")
+    #while(1):
+    #    choice = input("Please enter 1 for assembly and 2 for machine shop scheduling:  ")
+    #    date_entry = input('Enter a date in DD/MM/YYYY format: ')
+    #    today = datetime.strptime( date_entry,"%d/%m/%Y" )
+    #    if choice == '1':
+    #        try:
+    #            ofile= open("assembly output.csv","w")
+    #            ofile.write('Order, Line, Assigned Group, Start Date, Finish day, Ship day, Assembly Time, Status \n')
+    #        except PermissionError:
+    #            print('Please close the file output.csv and return the program')
+    #            ans = input("Press any button to exit")
+    #            exit()
+    #        filename = input("Please enter assembly input file name in .csv format:  ")
+    #        if read_data_assembly(filename, today):
+    #            #generate_assembly_schedule(ofile)
+    #            #print('Before Heuristic')
+    #            #print(useage)
+    #            ##assign_date(solution,ofile, today)
+    #            #best_fit(solution, useage)
+    #            assign_date(solution,ofile, today)
+    #        break
+        #elif choice == '2':
+        #    try:
+        #        seq = ['Saw', 'Mill', 'Punch', 'Welding', 'Body Assemly', 'Lens']
+        #        ofile= open("machining output.csv","w")
+        #        line = ['Order,Line , Status,']
+        #        for i in sequence:
+        #            line += i
+        #            line += ' Date '
+        #            line += ','
+        #            line += i
+        #            line += ' Time '
+        #            line += ','
+        #        line +='\n'
+        #        line = ''.join(line)
+        #        ofile.write(line)
+        #    except PermissionError:
+        #        print('Please close the file output.csv and return the program')
+        #        ans = input("Press any button to exit")
+        #        exit()
+        #    filename = input("Please enter assembly input file name in .csv format: ")
+        #    if read_data_machine(filename):
+        #        generate_machining_schedule()    
+        #        assign_date_machining(solution_machining,ofile, today)
+        #        break
+        #else: print("Wrong choice, please enter 1 or 2 only")
 
 if __name__ == "__main__":
     main()
