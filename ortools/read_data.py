@@ -253,7 +253,7 @@ capacity_machine= {
     }
 def assign_date(assembly_orders,file_output, today):
         
-    output = ['number', 'group', 'start_day', 'start', 'finish_day', 'finish', 'a_time', 'Status']
+    output = ['number', 'group', 'start_day', 'start', 'finish_day', 'finish', 'a_time', 'Status', 'Ship Date', 'Line']
     solution.sort(key = attrgetter('group', 'Status', 'priority' ), reverse=False)
     line = []
     useage_after = useage.fromkeys(useage, 0)
