@@ -199,7 +199,8 @@ def read_data_assembly(filename, today):
                 #quali = getattr(sub,'Production Group').split(',')
                 quali = list(map(int, getattr(sub,'Production Group').split(',')))
                 setattr(sub, 'qualified_groups',quali)
-                ID = str(row['Order']) + str(row['Line'])
+                value = [0, subtract]
+                ID = str(row['Order']) + str(row['Line']) + str(max(value))
                 setattr(sub, 'ID',int(ID))
                 if status_rank[sub.Status] == 1 :
                     sub.Status = 1
@@ -366,18 +367,18 @@ def generate_assembly_schedule(f):
               setattr(ord, 'Status', max(num))
               if ord.Status == i :
                   assembly_orders.append(ord)
-              foo = [1,4,7,10,12]
-              random.shuffle(foo)
-              #ord.qualified_group = getattr(ord.sections[0],'Production Group')
-              if(ord.Status == 1):
-                  ord.qualified_group = foo[0]
-              else:
-                ord.qualified_group = foo[: random.randint(1, 4)]
+              #foo = [1,4,7,10,12]
+              #random.shuffle(foo)
+              ##ord.qualified_group = getattr(ord.sections[0],'Production Group')
+              #if(ord.Status == 1):
+              #    ord.qualified_group = foo[0]
+              #else:
+              #  ord.qualified_group = foo[: random.randint(1, 4)]
         print("Number of Order with assembly status {} is {} ".format(i, len(assembly_orders)))
         if len(assembly_orders) > 0:
             #AssemblyScheduling(assembly_orders, useage)
             Assembly_Scheduling(assembly_orders, groups)
-            assign_date_pre(assembly_orders)
+            #assign_date_pre(assembly_orders)
         assembly_orders.clear()
 
 
