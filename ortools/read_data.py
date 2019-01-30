@@ -62,7 +62,7 @@ def map_oder_input(sub):
             map_order[sub.ID].priority = priority_rank [getattr(sub,'Promised')]
         map_order[sub.ID].add_section(sub)
         try:
-            map_order[sub.ID].a_time += math.ceil(getattr(sub,'Real Time'))
+            map_order[sub.ID].a_time += math.ceil(float(getattr(sub,'Real Time')))
         except TypeError or ValueError :
              pass
 
@@ -180,57 +180,61 @@ def read_data_assembly(filename, today):
     good_value = ['0', float('NaN')]
     for index, row in assembly_input.iterrows():
         if row['Order'] not in bad_orders:
-            if(row['Status'] in status_rank and row['ISSUE'] in good_value):
+            try:
+                r = float(row['Real Time'])
+                if(row['Status'] in status_rank and row['ISSUE'] in good_value ):
                 
-                sub = sub_order(index)
+                    sub = sub_order(index)
             
-                for value in fields:
-                    setattr(sub, value, row[value])
-                setattr(sub, 'priority', priority_rank[sub.Promised])
-                formatter_string = "%d.%m.%Y" 
-                datetime_object = datetime.strptime(getattr(sub,'Sched. Ship Date'), formatter_string)
-                setattr(sub,'ship_date', datetime_object.date())
-                setattr(sub,'delta', (datetime_object - today).days)
-                value = [0,(datetime_object - today).days]
-                ID = int(str(row['Order']) + str(max(value)))
-                if(ID not in map_order):
-                    ord = order(ID)
-                    setattr(ord, 'priority', 5)
-                    map_order[ID] = ord
-                setattr(sub,'ID', ID )
-                setattr(sub, 'group', getattr(sub,'Production Group'))
-                if status_rank[sub.Status] == 1 :
-                    sub.Status = 1
-                elif status_rank[sub.Status] == 2:
-                    try:
-                        if math.isnan(getattr(sub,'Missing Materials')):
-                            sub.Status = 2  
+                    for value in fields:
+                        setattr(sub, value, row[value])
+                    setattr(sub, 'priority', priority_rank[sub.Promised])
+                    formatter_string = "%d.%m.%Y" 
+                    datetime_object = datetime.strptime(getattr(sub,'Sched. Ship Date'), formatter_string)
+                    setattr(sub,'ship_date', datetime_object.date())
+                    setattr(sub,'delta', (datetime_object - today).days)
+                    value = [0,(datetime_object - today).days]
+                    ID = int(str(row['Order']) + str(max(value)))
+                    if(ID not in map_order):
+                        ord = order(ID)
+                        setattr(ord, 'priority', 5)
+                        map_order[ID] = ord
+                    setattr(sub,'ID', ID )
+                    setattr(sub, 'group', getattr(sub,'Production Group'))
+                    if status_rank[sub.Status] == 1 :
+                        sub.Status = 1
+                    elif status_rank[sub.Status] == 2:
+                        try:
+                            if math.isnan(getattr(sub,'Missing Materials')):
+                                sub.Status = 2  
                             
-                        elif getattr(sub,'Missing Materials') == '=+Cartridge':
-                            sub.Status = 3
+                            elif getattr(sub,'Missing Materials') == '=+Cartridge':
+                                sub.Status = 3
 
+                            else :sub.Status = 7
+                        except TypeError:
+                            sub.Status = 7
+                    elif status_rank[sub.Status] == 3:
+                        if getattr(sub,'Missing Materials') == '=+lens':
+                            sub.Status = 4   
+                        
+                        if getattr(sub,'Missing Materials') == 'Material+Cartridge':
+                            sub.Status = 5  
+                        
+                        if getattr(sub,'Missing Materials') == 'Material+lens+Cartridge+Housing':
+                            sub.Status = 6
+                        
                         else :sub.Status = 7
-                    except TypeError:
-                        sub.Status = 7
-                elif status_rank[sub.Status] == 3:
-                    if getattr(sub,'Missing Materials') == '=+lens':
-                        sub.Status = 4   
-                        
-                    if getattr(sub,'Missing Materials') == 'Material+Cartridge':
-                        sub.Status = 5  
-                        
-                    if getattr(sub,'Missing Materials') == 'Material+lens+Cartridge+Housing':
-                        sub.Status = 6
-                        
                     else :sub.Status = 7
-                else :sub.Status = 7
-                if int(sub.Status) :
-                    map_oder_input(sub)
-            else: 
-                if row['Order'] in bad_orders:
-                    bad_orders.remove(row['Order'])
+                    if int(sub.Status) :
+                        map_oder_input(sub)
                 else: 
-                    bad_orders.append(row['Order'])
+                    if row['Order'] in bad_orders:
+                        bad_orders.remove(row['Order'])
+                    else: 
+                        bad_orders.append(row['Order'])
+            except ValueError:
+                pass
     for index, ord in map_order.items():
               num = []
               [num.append(s.Status) for s in ord.sections]
@@ -303,6 +307,7 @@ def assign_date(assembly_orders,file_output, today):
             line = ''.join(line)
     file_output.write(line)
     #print('After heuristic')
+    print('Useage per group')
     print(useage_after)
 
 def assign_date_machining(solution,file_output, today):
