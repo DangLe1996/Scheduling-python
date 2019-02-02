@@ -1,0 +1,3 @@
+Order, Line, Status 
+Order, Line, Status, Ship day, Scheduled Ship Date, Issue, Missing Materials 
+77741,5,Machine Shop Finished,Regular,05.02.2019,0.0,nan,Partial Order,

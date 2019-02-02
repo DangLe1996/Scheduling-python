@@ -3,7 +3,7 @@ import pandas as pd
 import collections
 import random 
 import math
-from machining import MachineShopScheduling, AssemblyScheduling, best_fit
+#from machining import MachineShopScheduling, AssemblyScheduling, best_fit
 import time
 from operator import attrgetter
 from datetime import datetime,date, timedelta 
@@ -154,7 +154,7 @@ def read_data_assembly(filename, today):
     
 #order_input = pd.read_csv('order_input.csv')
     fields = ['Order', 'Line', 'Status', 'Sched. Ship Date',
-             'Real Status' , 'Real Time', 'Promised' , 'ISSUE','Missing Materials', 'Production Group' ]
+             'Real Status' , 'Real Time', 'Promised' , 'ISSUE','Missing Materials', 'Production Group', 'Complete/Partial' ]
     #section_input = pd.read_csv("Axis-Assembly-Input.csv", skiprows = 1)
     try:
         assembly_input = pd.read_csv(filename, skipinitialspace=True, usecols=fields)
@@ -162,7 +162,15 @@ def read_data_assembly(filename, today):
         print('Invalid file input or file does not exist, please check again')
         return 0
     #print("{} and  {} ".format(assembly_input['Production Group'], assembly_input['Order']))
-    
+    try:
+        d_file= open("debug.csv","w")
+        d_file.write('Order, Line, Status \n')
+    except PermissionError:
+        print('Please close the file debug.csv and return the program')
+        ans = input("Press any button to exit")
+        exit()
+    d_file.write('Order, Line, Status, Ship day, Scheduled Ship Date, Issue, Missing Materials \n')
+    dbug_value = ['Order', 'Line','Status','Promised', 'Sched. Ship Date', 'ISSUE','Missing Materials', 'Complete/Partial'  ]
     priority_rank = {
     'High Priority': 1,
     'Priority' : 2,
@@ -176,13 +184,15 @@ def read_data_assembly(filename, today):
         'Scheduled/Released': 4
 
         }
+    line = []
     bad_orders = []
     good_value = ['0', float('NaN')]
     for index, row in assembly_input.iterrows():
         if row['Order'] not in bad_orders:
             try:
                 r = float(row['Real Time'])
-                if(row['Status'] in status_rank and row['ISSUE'] in good_value ):
+                #if(row['Status'] in status_rank and row['ISSUE'] in good_value ): and row['Complete/Partial'] == 'Complete'
+                if(row['Status'] in status_rank and  (pd.isnull(row['ISSUE']) or row['ISSUE'] == 0)) and row['Complete/Partial'] == 'Complete':
                 
                     sub = sub_order(index)
             
@@ -205,7 +215,7 @@ def read_data_assembly(filename, today):
                         sub.Status = 1
                     elif status_rank[sub.Status] == 2:
                         try:
-                            if math.isnan(getattr(sub,'Missing Materials')):
+                            if pd.isnull(row['Missing Materials']):
                                 sub.Status = 2  
                             
                             elif getattr(sub,'Missing Materials') == '=+Cartridge':
@@ -215,13 +225,13 @@ def read_data_assembly(filename, today):
                         except TypeError:
                             sub.Status = 7
                     elif status_rank[sub.Status] == 3:
-                        if getattr(sub,'Missing Materials') == '=+lens':
+                        if getattr(sub,'Missing Materials') == '=+lens' or pd.isnull(row['Missing Materials']):
                             sub.Status = 4   
                         
-                        if getattr(sub,'Missing Materials') == 'Material+Cartridge':
+                        elif getattr(sub,'Missing Materials') == 'Material+Cartridge':
                             sub.Status = 5  
                         
-                        if getattr(sub,'Missing Materials') == 'Material+lens+Cartridge+Housing':
+                        elif getattr(sub,'Missing Materials') == 'Material+lens+Cartridge+Housing':
                             sub.Status = 6
                         
                         else :sub.Status = 7
@@ -229,10 +239,15 @@ def read_data_assembly(filename, today):
                     if int(sub.Status) :
                         map_oder_input(sub)
                 else: 
-                    if row['Order'] in bad_orders:
-                        bad_orders.remove(row['Order'])
-                    else: 
+                    if row['Order'] not in bad_orders:
                         bad_orders.append(row['Order'])
+                        for i in dbug_value:
+                            line += str(row[i])
+                            line +=','
+                        line += '\n' 
+                    #    bad_orders.remove(row['Order'])
+                    #else: 
+                    #    bad_orders.append(row['Order'])
             except ValueError:
                 pass
     for index, ord in map_order.items():
@@ -246,6 +261,14 @@ def read_data_assembly(filename, today):
               if ord.Status < 7:
                 setattr(ord, 'group', ord.sections[0].group)
                 solution.append(ord)
+              if ord.Status == 7:
+                  for sub in ord.sections:
+                      for i in dbug_value:
+                          line += str(getattr(sub,i))
+                          line += ','
+                      line += '\n'
+    line = ''.join(line)
+    d_file.write(line)
     print('File input sucessfully')
     return 1
 
@@ -289,26 +312,27 @@ def assign_date(assembly_orders,file_output, today):
     solution.sort(key = attrgetter('group', 'Status','delta', 'priority' ), reverse=False)
     line = []
     useage_after = useage.fromkeys(useage, 0)
-    for o in assembly_orders:
-        o.start = useage_after[o.group]
-        useage_after[o.group]  = useage_after[o.group] +  o.a_time
-        o.finish =  useage_after[o.group]
-        setattr(o, 'start_day', math.floor((o.start)/ (60*capacity[o.group])) )
-        o.start_day = today + timedelta(days=o.start_day)  
-        setattr(o, 'finish_day', math.floor((o.finish)/ (60*capacity[o.group])) )
-        o.finish_day = today + timedelta(days=o.finish_day)
-        for s in o.sections:
-            s.start_day = o.start_day
-            s.finish_day = o.finish_day
-            for i in output:
-                line += str(getattr(s,i))
-                line += ","   
-            line += "\n"
-            line = ''.join(line)
-    file_output.write(line)
-    #print('After heuristic')
-    print('Useage per group')
-    print(useage_after)
+    if len(assembly_orders) > 0:
+        for o in assembly_orders:
+            o.start = useage_after[o.group]
+            useage_after[o.group]  = useage_after[o.group] +  o.a_time
+            o.finish =  useage_after[o.group]
+            setattr(o, 'start_day', math.floor((o.start)/ (60*capacity[o.group])) )
+            o.start_day = today + timedelta(days=o.start_day)  
+            setattr(o, 'finish_day', math.floor((o.finish)/ (60*capacity[o.group])) )
+            o.finish_day = today + timedelta(days=o.finish_day)
+            for s in o.sections:
+                s.start_day = o.start_day
+                s.finish_day = o.finish_day
+                for i in output:
+                    line += str(getattr(s,i))
+                    line += ","   
+                line += "\n"
+                line = ''.join(line)
+        file_output.write(line)
+        #print('After heuristic')
+        print('Useage per group')
+        print(useage_after)
 
 def assign_date_machining(solution,file_output, today):
         
@@ -396,7 +420,8 @@ def generate_assembly_schedule(f):
         assembly_orders.clear()
 
 def main():
-    date_entry = input('Enter a date in DD/MM/YYYY format: ')
+    #date_entry = input('Enter a date in DD/MM/YYYY format: ')
+    date_entry = '02/02/2019'
     today = datetime.strptime( date_entry,"%d/%m/%Y" )
     try:
         ofile= open("assembly output.csv","w")
@@ -407,7 +432,7 @@ def main():
         exit()
     filename = input("Please enter assembly input file name in .csv format:  ")
     if read_data_assembly(filename, today):
-        assign_date(solution,ofile, today)
+       assign_date(solution,ofile, today)
     
     #while(1):
     #    choice = input("Please enter 1 for assembly and 2 for machine shop scheduling:  ")
