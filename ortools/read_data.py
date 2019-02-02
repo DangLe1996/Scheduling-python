@@ -164,12 +164,12 @@ def read_data_assembly(filename, today):
     #print("{} and  {} ".format(assembly_input['Production Group'], assembly_input['Order']))
     try:
         d_file= open("debug.csv","w")
-        d_file.write('Order, Line, Status \n')
+        d_file.write('Order, Line, Status, Ship day, Scheduled Ship Date, Issue, Missing Materials \n')
     except PermissionError:
         print('Please close the file debug.csv and return the program')
         ans = input("Press any button to exit")
         exit()
-    d_file.write('Order, Line, Status, Ship day, Scheduled Ship Date, Issue, Missing Materials \n')
+   
     dbug_value = ['Order', 'Line','Status','Promised', 'Sched. Ship Date', 'ISSUE','Missing Materials', 'Complete/Partial'  ]
     priority_rank = {
     'High Priority': 1,
@@ -192,7 +192,8 @@ def read_data_assembly(filename, today):
             try:
                 r = float(row['Real Time'])
                 #if(row['Status'] in status_rank and row['ISSUE'] in good_value ): and row['Complete/Partial'] == 'Complete'
-                if(row['Status'] in status_rank and  (pd.isnull(row['ISSUE']) or row['ISSUE'] == 0)) and row['Complete/Partial'] == 'Complete':
+                #and  (pd.isnull(row['ISSUE']) or row['ISSUE'] == 0) and row['Complete/Partial'] == 'Complete'
+                if row['Status'] in status_rank and row['Complete/Partial'] == 'Complete'and  (pd.isnull(row['ISSUE']) or row['ISSUE'] == '0'):
                 
                     sub = sub_order(index)
             
@@ -204,7 +205,7 @@ def read_data_assembly(filename, today):
                     setattr(sub,'ship_date', datetime_object.date())
                     setattr(sub,'delta', (datetime_object - today).days)
                     value = [0,(datetime_object - today).days]
-                    ID = int(str(row['Order']) + str(max(value)))
+                    ID = int(str(int(row['Order'])) + str(max(value)))
                     if(ID not in map_order):
                         ord = order(ID)
                         setattr(ord, 'priority', 5)
@@ -261,12 +262,6 @@ def read_data_assembly(filename, today):
               if ord.Status < 7:
                 setattr(ord, 'group', ord.sections[0].group)
                 solution.append(ord)
-              if ord.Status == 7:
-                  for sub in ord.sections:
-                      for i in dbug_value:
-                          line += str(getattr(sub,i))
-                          line += ','
-                      line += '\n'
     line = ''.join(line)
     d_file.write(line)
     print('File input sucessfully')
@@ -314,16 +309,22 @@ def assign_date(assembly_orders,file_output, today):
     useage_after = useage.fromkeys(useage, 0)
     if len(assembly_orders) > 0:
         for o in assembly_orders:
-            o.start = useage_after[o.group]
-            useage_after[o.group]  = useage_after[o.group] +  o.a_time
-            o.finish =  useage_after[o.group]
-            setattr(o, 'start_day', math.floor((o.start)/ (60*capacity[o.group])) )
-            o.start_day = today + timedelta(days=o.start_day)  
-            setattr(o, 'finish_day', math.floor((o.finish)/ (60*capacity[o.group])) )
-            o.finish_day = today + timedelta(days=o.finish_day)
+            #o.start = useage_after[o.group]
+            #useage_after[o.group]  = useage_after[o.group] +  o.a_time
+            #o.finish =  useage_after[o.group]
+            #setattr(o, 'start_day', math.floor((o.start)/ (60*capacity[o.group])) )
+            #o.start_day = today + timedelta(days=o.start_day)  
+            #setattr(o, 'finish_day', math.floor((o.finish)/ (60*capacity[o.group])) )
+            #o.finish_day = today + timedelta(days=o.finish_day)
             for s in o.sections:
-                s.start_day = o.start_day
-                s.finish_day = o.finish_day
+                s.group = int(s.group)
+                start =  useage_after[s.group]
+                useage_after[s.group]  = useage_after[s.group] + math.ceil(float(getattr(s,'Real Time')))
+                finish =  useage_after[s.group]
+                start = math.floor((start)/ (60*capacity[s.group]))
+                finish =  math.floor((finish)/ (60*capacity[s.group]))
+                s.start_day = today + timedelta(days=start)  
+                s.finish_day = today + timedelta(days=finish)  
                 for i in output:
                     line += str(getattr(s,i))
                     line += ","   
