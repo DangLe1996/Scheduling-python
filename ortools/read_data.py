@@ -164,7 +164,7 @@ def read_data_assembly(filename, today):
     #print("{} and  {} ".format(assembly_input['Production Group'], assembly_input['Order']))
     try:
         d_file= open("debug.csv","w")
-        d_file.write('Order, Line, Status, Ship day, Scheduled Ship Date, Issue, Missing Materials \n')
+        d_file.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials \n')
     except PermissionError:
         print('Please close the file debug.csv and return the program')
         ans = input("Press any button to exit")
@@ -187,6 +187,18 @@ def read_data_assembly(filename, today):
     line = []
     bad_orders = []
     good_value = ['0', float('NaN')]
+    for index, row in assembly_input.iterrows():
+        if row['Order'] not in bad_orders:
+            if not ( row['Status'] in status_rank and row['Complete/Partial'] == 'Complete' and  (pd.isnull(row['ISSUE']) or row['ISSUE'] == '0')):
+                bad_orders.append(row['Order'])
+                for i in dbug_value:
+                    line += str(row[i])
+                    line +=','
+                line += '\n' 
+    line = ''.join(line)
+    d_file.write(line)
+
+
     for index, row in assembly_input.iterrows():
         if row['Order'] not in bad_orders:
             try:
@@ -239,13 +251,15 @@ def read_data_assembly(filename, today):
                     else :sub.Status = 7
                     if int(sub.Status) :
                         map_oder_input(sub)
-                else: 
-                    if row['Order'] not in bad_orders:
-                        bad_orders.append(row['Order'])
-                        for i in dbug_value:
-                            line += str(row[i])
-                            line +=','
-                        line += '\n' 
+                #else: 
+                #    if row['Order'] not in bad_orders:
+                #        if row['Order'] in map_order:
+                #            map_order.pop(row['Order'],None)
+                #        bad_orders.append(row['Order'])
+                #        for i in dbug_value:
+                #            line += str(row[i])
+                #            line +=','
+                #        line += '\n' 
                     #    bad_orders.remove(row['Order'])
                     #else: 
                     #    bad_orders.append(row['Order'])
@@ -262,8 +276,8 @@ def read_data_assembly(filename, today):
               if ord.Status < 7:
                 setattr(ord, 'group', ord.sections[0].group)
                 solution.append(ord)
-    line = ''.join(line)
-    d_file.write(line)
+    #line = ''.join(line)
+    #d_file.write(line)
     print('File input sucessfully')
     return 1
 
