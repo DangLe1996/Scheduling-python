@@ -4,7 +4,9 @@ import collections
 import random 
 import math
 from machining import MachineShopScheduling, AssemblyScheduling, best_fit
-from assembly import Assembly_Scheduling
+#from assembly import Assembly_Scheduling,  assembly_scheduling
+from assembly import  assembly_scheduling
+
 import time
 from operator import attrgetter
 from datetime import datetime,date, timedelta 
@@ -389,8 +391,9 @@ def main():
     date_entry = "10/10/2019"
     today = datetime.strptime( date_entry,"%d/%m/%Y" )
     ofile= open("assembly output.csv","w")
-    if read_data_assembly(filename, today):
-                generate_assembly_schedule(ofile)
+    assembly_scheduling.read_data_assembly(filename, today)
+    #if read_data_assembly(filename, today):
+    #            generate_assembly_schedule(ofile)
                 #print('Before Heuristic')
                 #print(useage)
                 ##assign_date(solution,ofile, today)
