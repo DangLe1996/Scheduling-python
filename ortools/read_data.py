@@ -51,7 +51,17 @@ status_rank = {
     'Scheduled/Released': 4
 
     }
+capacity = {
+    #1: 21, 
+    #4: 21,
+    #7: 21,
+    #10: 14, 
+    #12: 14,
+    #15:14, 
+    #18:14
 
+    
+}
 all_sections = []
 map_order = {}
 solution =[]
@@ -158,6 +168,7 @@ def read_data_assembly(filename, today):
     #section_input = pd.read_csv("Axis-Assembly-Input.csv", skiprows = 1)
     try:
         assembly_input = pd.read_csv(filename, skipinitialspace=True, usecols=fields)
+        capacity_input = pd.read_csv('capacity.csv', skipinitialspace=True)
     except FileNotFoundError:
         print('Invalid file input or file does not exist, please check again')
         return 0
@@ -169,7 +180,8 @@ def read_data_assembly(filename, today):
         print('Please close the file debug.csv and return the program')
         ans = input("Press any button to exit")
         exit()
-   
+    for index, row in capacity_input.iterrows():
+       capacity[row["Group"]] = row["Capacity"]
     dbug_value = ['Order', 'Line','Status','Promised', 'Sched. Ship Date', 'ISSUE','Missing Materials', 'Complete/Partial'  ]
     priority_rank = {
     'High Priority': 1,
@@ -282,17 +294,7 @@ def read_data_assembly(filename, today):
     return 1
 
     
-capacity = {
-    1: 21, 
-    4: 21,
-    7: 21,
-    10: 14, 
-    12: 14,
-    15:14, 
-    18:14
 
-    
-}
 
 useage= {
     1: 0, 
