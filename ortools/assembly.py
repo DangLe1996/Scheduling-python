@@ -21,13 +21,8 @@ class order():
         self.a_time = 0
         self.Status = 0
         self.sections = []
-    def set_group(self,group):
-        self.qualified_group.append(group)
     def add_section(self,value):
         self.sections.append(value)
-    def update_time(self, start, finish, interval):
-        self.start = start
-        self.finish = finish
 class sub_order():
     priority_rank = {
     'High Priority': 1,
@@ -43,15 +38,8 @@ class sub_order():
 
        }
     def __init__(self, index ):
-        #self.order_number = order_number
-        #self.line = line
         self.index = index
-        self.tasks = {}
-        self.sequence = []
-        self.start = {}
-        self.finish = {}
-    def update_time(self,attr, task_type):
-        self.tasks[attr] = task_type
+    
 
 class groups():
     capacity = {}
@@ -167,57 +155,58 @@ class assembly_scheduling():
         print('File input sucessfully')
         for index, ord in cls.map_order.items():
             cls.order_rank[ord.Status].append(ord);
-        return 1
-    #def Assembly_Scheduling(all_orders, groups):
-    #    horizon = 5
-    #    from ortools.linear_solver import pywraplp
-    #    solver = pywraplp.Solver('CoinsGridCLP',
-    #                             pywraplp.Solver.CBC_MIXED_INTEGER_PROGRAMMING)
-    #    x = {}
-    #    y = {}
-    #    z = {}
-    #    variable_list = []
-    #    for o in all_orders:
-    #        for i in o.sections:
-    #            for j in i.qualified_groups:
-    #                x[(i.ID,j)] = solver.IntVar(0,1, 'x[%i,%i]' % (i.ID,j))
-    #                #variable_list.append(x[(i.ID,j)])
-    #            for j in range(horizon):
-    #                y[(i.ID,j)] = solver.IntVar(0,1, 'y[%i,%i]' % (i.ID,j))
-    #                #variable_list.append(y[(i.ID,j)])
-    #                for k in i.qualified_groups:
-    #                    z[(i.ID,j,k)] = solver.IntVar(0,int( i.real_time), 'z[%i,%i,%i]' % (i.ID,j,k))
-    #                    variable_list.append(z[(i.ID,j,k)])
+        return cls.order_rank
+    def schedule(all_orders, groups):
+        if len(all_orders) > 0:
+            horizon = 5
+            from ortools.linear_solver import pywraplp
+            solver = pywraplp.Solver('CoinsGridCLP',
+                                     pywraplp.Solver.CBC_MIXED_INTEGER_PROGRAMMING)
+            x = {}
+            y = {}
+            z = {}
+            variable_list = []
+            for o in all_orders:
+                for i in o.sections:
+                    for j in i.qualified_groups:
+                        x[(i.ID,j)] = solver.IntVar(0,1, 'x[%i,%i]' % (i.ID,j))
+                        #variable_list.append(x[(i.ID,j)])
+                    for j in range(horizon):
+                        y[(i.ID,j)] = solver.IntVar(0,1, 'y[%i,%i]' % (i.ID,j))
+                        #variable_list.append(y[(i.ID,j)])
+                        for k in i.qualified_groups:
+                            z[(i.ID,j,k)] = solver.IntVar(0,int( i.real_time), 'z[%i,%i,%i]' % (i.ID,j,k))
+                            variable_list.append(z[(i.ID,j,k)])
     
-    #    makespan = solver.IntVar(0,horizon, 'makespan')
-    #    days_used = solver.IntVar(0,10000, 'days_used')
-    #    for o in all_orders:
-    #        for i in o.sections:
-    #            solver.Add(solver.Sum([x[(i.ID,j)] for j in i.qualified_groups]) == 1) #one group
-    #            solver.Add(solver.Sum([y[(i.ID,j)] for j in range(horizon)]) >= 1) #multiple days
-    #            [solver.Add(makespan >= y[(i.ID,j)]*j) for j in range(horizon)]
-    #            [solver.Add(z[(i.ID,j,k)] <= i.real_time *x[(i.ID,k)]) for j in range(horizon) for k in i.qualified_groups]
-    #            [solver.Add(z[(i.ID,j,k)] <= i.real_time *y[(i.ID,j)]) for j in range(horizon) for k in i.qualified_groups]
-    #            solver.Add(solver.Sum([z[(i.ID,j,k)]for j in range(horizon) for k in i.qualified_groups]) == int( i.real_time))
-    #    solver.Add(days_used == solver.Sum([y[(i.ID,j)]for j in range(horizon) for o in all_orders for i in o.sections]) )
-    #    for k in groups.number:
-    #        expr = []
-    #        for j in range(horizon):
-    #            for o in all_orders:
-    #                for i in o.sections:
-    #                    if k in i.qualified_groups:
-    #                        expr.append(z[(i.ID,j,k)])
-    #            solver.Add(solver.Sum(expr[r] for r in range(len(expr))) <= groups.capacity[k])
-    #            expr.clear()
+            makespan = solver.IntVar(0,horizon, 'makespan')
+            days_used = solver.IntVar(0,10000, 'days_used')
+            for o in all_orders:
+                for i in o.sections:
+                    solver.Add(solver.Sum([x[(i.ID,j)] for j in i.qualified_groups]) == 1) #one group
+                    solver.Add(solver.Sum([y[(i.ID,j)] for j in range(horizon)]) >= 1) #multiple days
+                    [solver.Add(makespan >= y[(i.ID,j)]*j) for j in range(horizon)]
+                    [solver.Add(z[(i.ID,j,k)] <= i.real_time *x[(i.ID,k)]) for j in range(horizon) for k in i.qualified_groups]
+                    [solver.Add(z[(i.ID,j,k)] <= i.real_time *y[(i.ID,j)]) for j in range(horizon) for k in i.qualified_groups]
+                    solver.Add(solver.Sum([z[(i.ID,j,k)]for j in range(horizon) for k in i.qualified_groups]) == int( i.real_time))
+            solver.Add(days_used == solver.Sum([y[(i.ID,j)]for j in range(horizon) for o in all_orders for i in o.sections]) )
+            for k, value in groups.capacity.items():
+                expr = []
+                for j in range(horizon):
+                    for o in all_orders:
+                        for i in o.sections:
+                            if k in i.qualified_groups:
+                                expr.append(z[(i.ID,j,k)])
+                    solver.Add(solver.Sum(expr[r] for r in range(len(expr))) <= value*60)
+                    expr.clear()
 
 
-    #    solver.Minimize(makespan + days_used)
-    #    #solver.Minimize(makespan )
-    #    solver.Solve()
-    #    best = round(makespan.SolutionValue())
-    #    print(round(days_used.SolutionValue()))
-    #    print(best)
-    #    for variable in variable_list:
-    #        if variable.solution_value() > 0:
-    #            print(('%s = %f' % (variable.name(), variable.solution_value())))
+            solver.Minimize(makespan + days_used)
+            #solver.Minimize(makespan )
+            solver.Solve()
+            best = round(makespan.SolutionValue())
+            print(round(days_used.SolutionValue()))
+            print(best)
+        #for variable in variable_list:
+        #    if variable.solution_value() > 0:
+        #        print(('%s = %f' % (variable.name(), variable.solution_value())))
       
