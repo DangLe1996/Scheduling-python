@@ -68,11 +68,11 @@ solution =[]
 solution_machining = []
 def map_oder_input(sub):
     if sub not in map_order[sub.ID].sections:
-        if map_order[sub.ID].priority > priority_rank [getattr(sub,'Promised')] :
-            map_order[sub.ID].priority = priority_rank [getattr(sub,'Promised')]
+        if map_order[sub.ID].priority > priority_rank [getattr(sub,'Scheduled Ship Date')] :
+            map_order[sub.ID].priority = priority_rank [getattr(sub,'Scheduled Ship Date')]
         map_order[sub.ID].add_section(sub)
         try:
-            map_order[sub.ID].a_time += math.ceil(float(getattr(sub,'Real Time')))
+            map_order[sub.ID].a_time += math.ceil(float(getattr(sub,'Remaining Time')))
         except TypeError or ValueError :
              pass
 
@@ -163,8 +163,10 @@ def read_data_assembly(filename, today):
 
     
 #order_input = pd.read_csv('order_input.csv')
-    fields = ['Order', 'Line', 'Status', 'Sched. Ship Date',
-             'Real Status' , 'Real Time', 'Promised' , 'ISSUE','Missing Materials', 'Production Group', 'Complete/Partial' ]
+    fields = ['Order', 'Line', 'Status', 'Scheduled Ship Date',
+              'Remaining Time', 'Sched Date Priority' ,
+			 'Issue','Missing Materials',
+			 'Assembly Line', 'Complete/Partial' ]
     #section_input = pd.read_csv("Axis-Assembly-Input.csv", skiprows = 1)
     try:
         assembly_input = pd.read_csv(filename, skipinitialspace=True, usecols=fields)
@@ -176,15 +178,15 @@ def read_data_assembly(filename, today):
     try:
         d_file= open("debug.csv","w")
         status_7= open("status_7.csv","w")
-        status_7.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials \n')
-        d_file.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials \n')
+        status_7.write('Order, Line, Status, Sched Date Priority, Scheduled Ship Date, Issue, Missing Materials \n')
+        d_file.write('Order, Line, Status, Sched Date Priority, Scheduled Ship Date, Issue, Missing Materials \n')
     except PermissionError:
         print('Please close the file debug.csv and return the program')
         ans = input("Press any button to exit")
         exit()
     for index, row in capacity_input.iterrows():
        capacity[row["Group"]] = row["Capacity"]
-    dbug_value = ['Order', 'Line','Status','Promised', 'Sched. Ship Date', 'ISSUE','Missing Materials', 'Complete/Partial'  ]
+    dbug_value = ['Order', 'Line','Status','Sched Date Priority', 'Scheduled Ship Date', 'Issue','Missing Materials', 'Complete/Partial'  ]
     priority_rank = {
     'High Priority': 1,
     'Priority' : 2,
@@ -203,14 +205,14 @@ def read_data_assembly(filename, today):
     good_value = ['0', float('NaN')]
     for index, row in assembly_input.iterrows():
         if row['Order'] not in bad_orders:
-            if not ( row['Status'] in status_rank and row['Complete/Partial'] == 'Complete' and  (pd.isnull(row['ISSUE']) or row['ISSUE'] == '0')):
+            if not ( row['Status'] in status_rank and row['Complete/Partial'] == 'Complete' and  (pd.isnull(row['Issue']) or row['Issue'] == '0')):
                 bad_orders.append(row['Order'])
                 for i in dbug_value:
                     line += str(row[i])
                     line +=','
                 line += '\n' 
         elif row['Order'] in bad_orders:
-            if not ( row['Status'] in status_rank and row['Complete/Partial'] == 'Complete' and  (pd.isnull(row['ISSUE']) or row['ISSUE'] == '0')):
+            if not ( row['Status'] in status_rank and row['Complete/Partial'] == 'Complete' and  (pd.isnull(row['Issue']) or row['Issue'] == '0')):
                 bad_orders.append(row['Order'])
                 for i in dbug_value:
                     line += str(row[i])
@@ -223,18 +225,17 @@ def read_data_assembly(filename, today):
     for index, row in assembly_input.iterrows():
         if row['Order'] not in bad_orders:
             try:
-                r = float(row['Real Time'])
-                #if(row['Status'] in status_rank and row['ISSUE'] in good_value ): and row['Complete/Partial'] == 'Complete'
-                #and  (pd.isnull(row['ISSUE']) or row['ISSUE'] == 0) and row['Complete/Partial'] == 'Complete'
-                if row['Status'] in status_rank and row['Complete/Partial'] == 'Complete'and  (pd.isnull(row['ISSUE']) or row['ISSUE'] == '0'):
+                r = float(row['Remaining Time'])
+            
+                if row['Status'] in status_rank and row['Complete/Partial'] == 'Complete'and  (pd.isnull(row['Issue']) or row['Issue'] == '0'):
                 
                     sub = sub_order(index)
             
                     for value in fields:
                         setattr(sub, value, row[value])
-                    setattr(sub, 'priority', priority_rank[sub.Promised])
+                    setattr(sub, 'priority', priority_rank[getattr(sub,'Sched Date Priority')])
                     formatter_string = "%d.%m.%Y" 
-                    datetime_object = datetime.strptime(getattr(sub,'Sched. Ship Date'), formatter_string)
+                    datetime_object = datetime.strptime(getattr(sub,'Scheduled Ship Date'), formatter_string)
                     setattr(sub,'ship_date', datetime_object.date())
                     setattr(sub,'real_stat', sub.Status)
                     setattr(sub,'delta', (datetime_object - today).days)
@@ -245,7 +246,7 @@ def read_data_assembly(filename, today):
                         setattr(ord, 'priority', 5)
                         map_order[ID] = ord
                     setattr(sub,'ID', ID )
-                    setattr(sub, 'group', getattr(sub,'Production Group'))
+                    setattr(sub, 'group', getattr(sub,'Assembly Line'))
                     if status_rank[sub.Status] == 1 :
                         sub.Status = 1
                     elif status_rank[sub.Status] == 2:
@@ -271,20 +272,8 @@ def read_data_assembly(filename, today):
                         
                         else :sub.Status = 7
                     else :sub.Status = 7
-                    if int(sub.Status) :
-                        map_oder_input(sub)
-                #else: 
-                #    if row['Order'] not in bad_orders:
-                #        if row['Order'] in map_order:
-                #            map_order.pop(row['Order'],None)
-                #        bad_orders.append(row['Order'])
-                #        for i in dbug_value:
-                #            line += str(row[i])
-                #            line +=','
-                #        line += '\n' 
-                    #    bad_orders.remove(row['Order'])
-                    #else: 
-                    #    bad_orders.append(row['Order'])
+                    map_oder_input(sub)
+            
             except ValueError:
                 pass
     line2 = []
@@ -340,7 +329,7 @@ capacity_machine= {
     }
 def assign_date(assembly_orders,file_output, today):
         
-    output = ['Order', 'Line', 'group','start_day', 'finish_day', 'ship_date', 'Real Time', 'Status']
+    output = ['Order', 'Line', 'group','start_day', 'finish_day', 'ship_date', 'Remaining Time', 'Status']
     #output_order = ['start_day', 'finish_day']
     solution.sort(key = attrgetter('group', 'Status','delta', 'priority' ), reverse=False)
     line = []
@@ -357,7 +346,7 @@ def assign_date(assembly_orders,file_output, today):
             for s in o.sections:
                 s.group = int(s.group)
                 start =  useage_after[s.group]
-                useage_after[s.group]  = useage_after[s.group] + math.ceil(float(getattr(s,'Real Time')))
+                useage_after[s.group]  = useage_after[s.group] + math.ceil(float(getattr(s,'Remaining Time')))
                 finish =  useage_after[s.group]
                 start = math.floor((start)/ (60*capacity[s.group]))
                 finish =  math.floor((finish)/ (60*capacity[s.group]))
@@ -469,7 +458,8 @@ def main():
         print('Please close the file output.csv and return the program')
         ans = input("Press any button to exit")
         exit()
-    filename = input("Please enter assembly input file name in .csv format:  ")
+    #filename = input("Please enter assembly input file name in .csv format:  ")
+    filename  = 'feb8.csv'
     if read_data_assembly(filename, today):
        assign_date(solution,ofile, today)
     
