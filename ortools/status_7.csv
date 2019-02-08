@@ -1,399 +1,342 @@
 Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials 
-77005,1,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77005,2,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-73536,2,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75467,1,7,Regular,29.11.2018,nan,Material+Cartridge,Complete,Machine Shop Finished
-75467,2,7,Regular,29.11.2018,nan,Material+Cartridge,Complete,Machine Shop Finished
-75467,4,7,Regular,29.11.2018,0,Material+Cartridge,Complete,Machine Shop Finished
-75467,6,7,Regular,29.11.2018,0,Material+Cartridge,Complete,Machine Shop Finished
-78163,1,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-78163,2,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78163,3,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-78163,4,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-78441,1,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77524,1,7,Regular,23.01.2019,0,Material+Cartridge+Housing,Complete,Machine Shop Started
-77524,2,7,Regular,23.01.2019,0,Material+Cartridge+Housing,Complete,Machine Shop Started
-77524,3,7,Regular,23.01.2019,0,Material+Cartridge+Housing,Complete,Machine Shop Started
-77524,4,7,Regular,23.01.2019,0,Material+Cartridge+Housing,Complete,Machine Shop Started
-77524,5,7,Regular,23.01.2019,0,Material+Cartridge+Housing,Complete,Machine Shop Started
-77524,6,7,Regular,23.01.2019,0,Material+Cartridge+Housing,Complete,Machine Shop Started
-77524,7,7,Regular,23.01.2019,0,Material+Cartridge+Housing,Complete,Machine Shop Started
-77524,8,7,Regular,23.01.2019,0,Material+Cartridge+Housing,Complete,Machine Shop Started
-78157,1,7,High Priority,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78157,2,7,High Priority,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78157,3,7,High Priority,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78157,4,7,High Priority,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-70162,5,7,Regular,22.01.2019,0,Material+Cartridge,Complete,Machine Shop Finished
-70162,9,7,Regular,22.01.2019,0,Material+Cartridge,Complete,Machine Shop Finished
-78417,1,7,High Priority,30.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-78417,2,7,High Priority,30.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-78417,3,7,High Priority,30.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77462,1,7,Regular,22.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77462,2,7,Regular,22.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-70280,1,7,High Priority,28.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77398,1,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77398,2,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77398,3,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-74968,1,7,Regular,29.01.2019,nan,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-74968,2,7,Regular,29.01.2019,nan,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-74968,3,7,Regular,29.01.2019,nan,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78466,1,7,Regular,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77925,1,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-75981,13,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75981,15,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77675,1,7,Regular,11.01.2019,0,Material,Complete,Machine Shop Finished
-74740,10,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-74740,11,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-74740,12,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-74740,13,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-74740,14,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-74740,15,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-74740,16,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-74740,17,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-74740,19,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-74740,20,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-74740,21,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-74740,22,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77831,1,7,Priority,22.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-75830,1,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75830,2,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75830,3,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77282,1,7,Regular,22.01.2019,0,Material+Housing,Complete,Machine Shop Started
-77282,2,7,Regular,22.01.2019,0,Material+Housing,Complete,Machine Shop Started
-78080,1,7,Regular,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78254,1,7,High Priority,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78254,2,7,High Priority,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78254,3,7,High Priority,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78303,1,7,Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76028,1,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,2,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,3,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,4,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,5,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,6,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,7,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,8,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,9,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,10,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,11,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,12,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,13,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,15,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,16,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,17,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,18,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,19,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,20,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,21,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,22,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,23,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,24,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,25,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,26,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,27,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,28,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,29,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,30,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,31,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,33,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,34,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,35,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,36,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,37,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,38,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,39,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,40,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,41,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,42,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76028,43,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-78363,1,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78158,1,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-78158,2,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-76887,1,7,Regular,17.01.2019,0,+lens+Housing,Complete,Machine Shop Finished
-76192,1,7,Regular,30.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76192,2,7,Regular,30.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76192,3,7,Regular,30.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76192,4,7,Regular,30.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76192,5,7,Regular,30.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76192,6,7,Regular,30.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77069,1,7,Regular,21.01.2019,0,Material+lens+Cartridge,Complete,Machine Shop Started
-77069,2,7,Regular,21.01.2019,0,Material+lens+Cartridge,Complete,Machine Shop Started
-77069,3,7,Regular,21.01.2019,0,Material+lens+Cartridge,Complete,Machine Shop Started
-77069,4,7,Regular,21.01.2019,0,Material+lens+Cartridge,Complete,Machine Shop Started
-77069,5,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-77069,6,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-78082,1,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76385,5,7,Regular,21.01.2019,0,Material+Housing,Complete,Machine Shop Started
-76385,6,7,Regular,21.01.2019,0,Material+Housing,Complete,Machine Shop Started
-76385,7,7,Regular,21.01.2019,0,Material+Housing,Complete,Machine Shop Started
-76385,8,7,Regular,21.01.2019,0,Material+Housing,Complete,Machine Shop Started
-75730,4,7,Regular,23.01.2019,nan,Material+lens+Housing,Complete,Machine Shop Started
-77791,1,7,Regular,21.01.2019,0,Material+Cartridge+Housing,Complete,Machine Shop Started
-77791,2,7,Regular,21.01.2019,0,Material+Cartridge+Housing,Complete,Machine Shop Started
-75859,4,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,29,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,30,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,35,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,38,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,41,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,44,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,46,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,48,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,52,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,53,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,55,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,58,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,60,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,63,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,65,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,68,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,72,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,75,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,76,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,93,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,95,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,96,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75859,99,7,Regular,28.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77878,1,7,Regular,15.01.2019,0,+lens+Housing,Complete,Machine Shop Finished
-78207,1,7,Regular,23.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-78207,2,7,Regular,23.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-78207,3,7,Regular,23.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-74543,1,7,Regular,23.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77992,1,7,High Priority,23.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77992,2,7,High Priority,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77992,3,7,High Priority,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77611,1,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77611,2,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77611,3,7,Regular,23.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-76786,1,7,Regular,30.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76786,2,7,Regular,30.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76786,3,7,Regular,30.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78071,1,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78071,2,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78071,3,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78071,4,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78071,5,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78208,1,7,Regular,22.01.2019,0,Material+Housing,Complete,Machine Shop Started
-78208,2,7,Regular,22.01.2019,0,Material+Housing,Complete,Machine Shop Started
-78208,3,7,Regular,22.01.2019,0,Material+Housing,Complete,Machine Shop Started
-77435,1,7,High Priority,22.01.2019,nan,+lens+Cartridge+Housing,Complete,Machine Shop Started
-77848,1,7,High Priority,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77848,2,7,High Priority,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77848,3,7,High Priority,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77848,4,7,High Priority,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77848,5,7,High Priority,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75745,5,7,Regular,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75745,6,7,Regular,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75745,7,7,Regular,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75745,8,7,Regular,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75745,9,7,Regular,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75745,13,7,Regular,28.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-78073,1,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78073,2,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78073,3,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78073,4,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78073,5,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78073,6,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78073,7,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78073,8,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78073,9,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78073,10,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78132,1,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78132,2,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76575,2,7,High Priority,22.01.2019,0,Material+lens+Cartridge,Complete,Machine Shop Started
-76575,3,7,High Priority,22.01.2019,0,Material+lens+Cartridge,Complete,Machine Shop Started
-76575,4,7,High Priority,22.01.2019,0,Material+lens+Cartridge,Complete,Machine Shop Started
-76575,5,7,High Priority,22.01.2019,0,Material+lens+Cartridge,Complete,Machine Shop Started
-76575,6,7,High Priority,22.01.2019,0,Material+lens+Cartridge,Complete,Machine Shop Started
-78277,1,7,Regular,23.01.2019,0,Material+Cartridge+Housing,Complete,Machine Shop Started
-68871,1,7,Regular,21.01.2019,0,+lens+Cartridge+Housing,Complete,Machine Shop Started
-68871,2,7,Regular,21.01.2019,0,+lens+Cartridge,Complete,Machine Shop Started
-68871,3,7,Regular,21.01.2019,0,+lens+Cartridge+Housing,Complete,Machine Shop Started
-68871,4,7,Regular,21.01.2019,0,+lens+Cartridge+Housing,Complete,Machine Shop Started
-68871,5,7,Regular,21.01.2019,0,+lens+Cartridge+Housing,Complete,Machine Shop Started
-68871,6,7,Regular,21.01.2019,0,+lens+Cartridge+Housing,Complete,Machine Shop Started
-68871,7,7,Regular,21.01.2019,0,+lens+Cartridge+Housing,Complete,Machine Shop Started
-68871,8,7,Regular,21.01.2019,0,+lens+Cartridge,Complete,Machine Shop Started
-68871,9,7,Regular,21.01.2019,0,+lens+Cartridge,Complete,Machine Shop Started
-68871,10,7,Regular,21.01.2019,0,+lens+Cartridge,Complete,Machine Shop Started
-68871,11,7,Regular,21.01.2019,0,+lens+Cartridge,Complete,Machine Shop Started
-68871,12,7,Regular,21.01.2019,0,+lens+Cartridge,Complete,Machine Shop Started
-68871,13,7,Regular,21.01.2019,0,+lens+Cartridge+Housing,Complete,Machine Shop Started
-68871,14,7,Regular,21.01.2019,0,+lens+Cartridge,Complete,Machine Shop Started
-68871,15,7,Regular,21.01.2019,0,+lens+Cartridge+Housing,Complete,Machine Shop Started
-68871,16,7,Regular,21.01.2019,0,+lens+Cartridge+Housing,Complete,Machine Shop Started
-77945,1,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77945,2,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77945,3,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77945,4,7,High Priority,22.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77945,5,7,High Priority,22.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77945,6,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77945,7,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77945,8,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77945,9,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77945,10,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77945,11,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77945,12,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77945,13,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77945,14,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77945,15,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77947,1,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77947,2,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77947,3,7,High Priority,22.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77947,4,7,High Priority,22.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77947,5,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77947,6,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77947,7,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77947,8,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77947,9,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77947,10,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77947,11,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77947,12,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77947,13,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77947,14,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77947,15,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78156,1,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-78156,2,7,Regular,25.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-78384,1,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78384,2,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78384,3,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78384,4,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78384,5,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78384,6,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78384,7,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78384,8,7,Regular,25.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76507,1,7,Regular,28.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76507,2,7,Regular,28.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76507,3,7,Regular,28.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76507,4,7,Regular,28.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76507,5,7,Regular,28.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76507,6,7,Regular,28.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76507,7,7,Regular,28.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76507,8,7,Regular,28.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-77684,1,7,Regular,21.01.2019,0,+lens+Cartridge+Housing,Complete,Machine Shop Started
-77204,1,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77204,2,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77204,3,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77204,4,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77204,5,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77204,6,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77204,7,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77204,8,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77204,9,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77204,10,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77204,11,7,High Priority,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76338,1,7,Regular,23.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-76338,2,7,Regular,23.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-76338,5,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77014,1,7,Regular,29.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77014,2,7,Regular,29.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77014,3,7,Regular,29.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-76937,1,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76937,2,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76937,3,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76937,4,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76937,6,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76937,7,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76937,8,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76937,10,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78494,1,7,Regular,23.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-78350,1,7,Regular,29.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77890,1,7,Regular,23.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-78102,1,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78102,2,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78102,3,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77482,1,7,Regular,23.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78066,1,7,Regular,21.01.2019,0,+lens,Complete,Machine Shop Started
-78066,2,7,Regular,21.01.2019,0,+lens,Complete,Machine Shop Started
-78066,3,7,Regular,21.01.2019,0,+lens,Complete,Machine Shop Started
-78066,4,7,Regular,21.01.2019,0,+lens,Complete,Machine Shop Started
-75103,2,7,Regular,23.01.2019,0,Material+lens+Cartridge,Complete,Machine Shop Started
-75103,8,7,Regular,23.01.2019,0,Material+lens+Cartridge,Complete,Machine Shop Started
-75103,9,7,Regular,23.01.2019,0,Material+lens+Cartridge,Complete,Machine Shop Started
-73835,12,7,High Priority,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-73835,14,7,High Priority,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-73835,16,7,High Priority,21.01.2019,0,Material+lens,Complete,Machine Shop Started
-73835,18,7,High Priority,21.01.2019,0,Material+lens,Complete,Machine Shop Started
-73835,20,7,High Priority,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-73835,22,7,High Priority,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-73835,24,7,High Priority,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76825,1,7,Regular,22.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-78037,1,7,Regular,17.01.2019,0,+lens+Housing,Complete,Machine Shop Finished
-76620,1,7,High Priority,25.01.2019,nan,Material+lens+Housing,Complete,Scheduled/Released
-76620,2,7,High Priority,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-78341,1,7,High Priority,17.01.2019,0,+lens+Housing,Complete,Machine Shop Finished
-76896,2,7,Priority,18.01.2019,0,+lens+Housing,Complete,Machine Shop Finished
-78095,1,7,Regular,17.01.2019,0,+lens+Housing,Complete,Machine Shop Finished
-77739,1,7,High Priority,17.01.2019,0,+Cartridge,Complete,Machine Shop Finished
-72589,1,7,Priority,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-72589,2,7,Priority,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-72589,3,7,Priority,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-72589,4,7,Priority,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-72589,5,7,Priority,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-72589,6,7,Priority,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-72589,7,7,Priority,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-76851,1,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76851,2,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76851,3,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76851,4,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76851,5,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76851,6,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76851,7,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-76851,8,7,Regular,29.01.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77926,1,7,Regular,11.02.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-75746,1,7,Regular,21.01.2019,0,+lens+Cartridge+Housing,Complete,Machine Shop Started
-75746,2,7,Regular,21.01.2019,0,+lens+Cartridge+Housing,Complete,Machine Shop Started
-75746,3,7,Regular,21.01.2019,0,+lens+Cartridge+Housing,Complete,Machine Shop Started
-75746,4,7,Regular,21.01.2019,0,+lens+Cartridge+Housing,Complete,Machine Shop Started
-75746,9,7,Regular,21.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-75746,10,7,Regular,21.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-75746,11,7,Regular,21.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-75746,12,7,Regular,21.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-75746,13,7,Regular,21.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-75746,14,7,Regular,21.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-75746,15,7,Regular,21.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-75746,16,7,Regular,21.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-75746,17,7,Regular,21.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-75746,18,7,Regular,21.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-75746,19,7,Regular,21.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-75746,20,7,Regular,21.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-75746,21,7,Regular,21.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-75746,27,7,Regular,21.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-75746,28,7,Regular,21.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-75746,5,7,Regular,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75746,6,7,Regular,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75746,7,7,Regular,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75746,8,7,Regular,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-75746,22,7,Regular,11.02.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-75746,24,7,Regular,11.02.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-75746,25,7,Regular,11.02.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-75746,26,7,Regular,11.02.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-75746,31,7,Regular,11.02.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-75746,34,7,Regular,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77632,1,7,High Priority,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77632,2,7,High Priority,25.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-78249,1,7,Regular,22.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77846,1,7,Priority,23.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77846,2,7,Priority,23.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77846,3,7,Priority,23.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77846,4,7,Priority,23.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-76995,1,7,Regular,18.01.2019,0,+lens+Housing,Complete,Machine Shop Finished
-76995,2,7,Regular,18.01.2019,0,+lens+Housing,Complete,Machine Shop Finished
-76995,3,7,Regular,18.01.2019,0,+lens+Housing,Complete,Machine Shop Finished
-76995,4,7,Regular,18.01.2019,0,+lens+Housing,Complete,Machine Shop Finished
-76995,5,7,Regular,18.01.2019,0,+lens+Housing,Complete,Machine Shop Finished
-77666,1,7,High Priority,11.02.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77666,2,7,High Priority,11.02.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77666,3,7,High Priority,11.02.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-77666,4,7,High Priority,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77666,5,7,High Priority,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77666,6,7,High Priority,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77666,7,7,High Priority,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77666,8,7,High Priority,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-77666,9,7,High Priority,11.02.2019,0,Material+lens+Cartridge+Housing,Complete,Scheduled/Released
-72049,3,7,Regular,29.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-72049,4,7,Regular,29.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-72049,15,7,Regular,29.01.2019,0,Material+lens+Housing,Complete,Scheduled/Released
-72049,16,7,Regular,29.01.2019,0,+lens+Housing,Complete,Machine Shop Started
-78537,1,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
-78537,2,7,Regular,21.01.2019,0,Material+lens+Housing,Complete,Machine Shop Started
+78636,1,7,Regular,04.02.2019,0,Material,Complete,Machine Shop Finished
+78617,1,7,High Priority,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78346,1,7,Regular,15.02.2019,0,Material,Complete,Machine Shop Started
+78581,5,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,6,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,7,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,8,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,9,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,10,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,11,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,12,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,13,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,14,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,15,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,16,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,17,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,18,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,19,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,20,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,21,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,22,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,23,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,24,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,25,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,26,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,27,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,28,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,29,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,30,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,31,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,32,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,33,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,34,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,35,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,36,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,37,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,38,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,39,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,40,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,41,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,42,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,43,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,44,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,45,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,46,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,47,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,48,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,49,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,50,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,51,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,52,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,53,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,54,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,55,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,56,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,57,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,58,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,59,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,60,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,61,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,62,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+78581,63,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+70162,7,7,Regular,14.02.2019,0,Material+Cartridge,Complete,Machine Shop Finished
+77808,2,7,Regular,04.02.2019,0,Material+Cartridge,Complete,Machine Shop Finished
+78500,1,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78500,2,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78500,3,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78500,4,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78500,5,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78500,6,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78500,7,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78500,8,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78500,9,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78500,10,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78500,11,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78500,12,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78596,1,7,High Priority,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78596,2,7,High Priority,15.02.2019,0,Material,Complete,Scheduled/Released
+78596,3,7,High Priority,15.02.2019,0,Material,Complete,Scheduled/Released
+78596,4,7,High Priority,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77149,1,7,Regular,19.02.2019,0,Material,Complete,Machine Shop Started
+77149,2,7,Regular,19.02.2019,0,Material,Complete,Machine Shop Started
+77149,3,7,Regular,19.02.2019,0,Material,Complete,Machine Shop Started
+78789,1,7,Regular,08.02.2019,0,+Cartridge,Complete,Machine Shop Finished
+79104,1,7,Regular,20.02.2019,0,Material,Complete,Machine Shop Started
+63435,2,7,Regular,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+63435,7,7,Regular,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78934,1,7,Regular,06.03.2019,0,Material,Complete,Machine Shop Started
+79194,1,7,High Priority,15.02.2019,0,Material,Complete,Scheduled/Released
+79194,2,7,High Priority,15.02.2019,0,Material,Complete,Scheduled/Released
+79194,3,7,High Priority,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76076,1,7,Regular,08.02.2019,0,+Cartridge,Complete,Machine Shop Finished
+76076,2,7,Regular,08.02.2019,0,+Cartridge,Complete,Machine Shop Finished
+76076,3,7,Regular,08.02.2019,0,+Cartridge,Complete,Machine Shop Finished
+76076,4,7,Regular,08.02.2019,0,+Cartridge,Complete,Machine Shop Finished
+76155,1,7,Regular,22.02.2019,0,Material,Complete,Scheduled/Released
+76155,2,7,Regular,22.02.2019,0,Material,Complete,Scheduled/Released
+76155,3,7,Regular,22.02.2019,0,Material,Complete,Scheduled/Released
+76155,4,7,Regular,22.02.2019,0,Material,Complete,Scheduled/Released
+76155,5,7,Regular,22.02.2019,0,Material,Complete,Scheduled/Released
+76155,6,7,Regular,22.02.2019,0,Material,Complete,Scheduled/Released
+76155,7,7,Regular,22.02.2019,0,Material,Complete,Scheduled/Released
+78491,1,7,Regular,06.02.2019,0,+Cartridge,Complete,Machine Shop Finished
+78706,1,7,Regular,07.02.2019,0,+Cartridge,Complete,Machine Shop Finished
+78706,2,7,Regular,07.02.2019,0,+Cartridge,Complete,Machine Shop Finished
+76943,1,7,High Priority,22.02.2019,0,Material,Complete,Scheduled/Released
+76943,2,7,High Priority,22.02.2019,0,Material,Complete,Scheduled/Released
+77195,1,7,Regular,05.03.2019,0,Material+Cartridge,Complete,Scheduled/Released
+79076,1,7,Regular,08.02.2019,0,+Cartridge,Complete,Machine Shop Finished
+78711,1,7,Regular,06.02.2019,0,Material,Complete,Machine Shop Finished
+73827,1,7,Regular,11.03.2019,0,+Cartridge,Complete,Machine Shop Finished
+79320,1,7,High Priority,04.02.2019,0,Material,Complete,Machine Shop Finished
+78050,1,7,Regular,07.02.2019,nan,+Cartridge,Complete,Machine Shop Finished
+78854,1,7,Regular,06.02.2019,0,Material,Complete,Machine Shop Finished
+77497,11,7,High Priority,05.03.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77497,12,7,High Priority,05.03.2019,0,Material+Cartridge,Complete,Scheduled/Released
+79001,1,7,Regular,04.02.2019,0,Material,Complete,Machine Shop Finished
+76093,2,7,Regular,12.02.2019,0,Material+Cartridge,Complete,Machine Shop Finished
+76550,4,7,Priority,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76550,5,7,Priority,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76550,6,7,Priority,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76550,7,7,Priority,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76550,8,7,Priority,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76550,9,7,Priority,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76550,10,7,Priority,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76550,11,7,Priority,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76550,12,7,Priority,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76550,13,7,Priority,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77856,1,7,Regular,20.03.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77856,2,7,Regular,20.03.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78502,1,7,Regular,05.02.2019,0,Material,Complete,Machine Shop Finished
+76465,4,7,Regular,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76465,5,7,Regular,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76465,6,7,Regular,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76465,8,7,Regular,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76465,9,7,Regular,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76465,10,7,Regular,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76465,11,7,Regular,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76465,12,7,Regular,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77441,1,7,Regular,08.03.2019,0,Material,Complete,Scheduled/Released
+77441,2,7,Regular,08.03.2019,0,Material,Complete,Scheduled/Released
+78436,1,7,High Priority,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78436,2,7,High Priority,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78436,3,7,High Priority,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78436,4,7,High Priority,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78436,6,7,High Priority,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78436,7,7,High Priority,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78436,8,7,High Priority,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78436,9,7,High Priority,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78436,10,7,High Priority,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78436,11,7,High Priority,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77370,1,7,High Priority,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77370,2,7,High Priority,15.02.2019,nan,Material+Cartridge,Complete,Scheduled/Released
+78983,1,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78983,2,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78983,3,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78642,1,7,Regular,01.03.2019,nan,Material+Cartridge,Complete,Scheduled/Released
+78642,2,7,Regular,01.03.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78642,4,7,Regular,01.03.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78642,5,7,Regular,01.03.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78642,6,7,Regular,01.03.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78642,8,7,Regular,01.03.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78642,11,7,Regular,01.03.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78517,1,7,Regular,08.02.2019,0,Material,Complete,Machine Shop Finished
+78517,2,7,Regular,08.02.2019,0,Material+Cartridge,Complete,Machine Shop Finished
+79042,13,7,Regular,22.02.2019,0,Material,Complete,Scheduled/Released
+79042,14,7,Regular,22.02.2019,0,Material,Complete,Scheduled/Released
+78009,1,7,Regular,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78009,2,7,Regular,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+79245,1,7,Regular,21.02.2019,0,Material,Complete,Scheduled/Released
+79245,2,7,Regular,21.02.2019,0,Material,Complete,Scheduled/Released
+78893,1,7,High Priority,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78047,1,7,Regular,08.02.2019,0,Material,Complete,Machine Shop Finished
+78047,2,7,Regular,08.02.2019,0,Material,Complete,Machine Shop Finished
+78047,3,7,Regular,08.02.2019,0,Material,Complete,Machine Shop Finished
+78047,4,7,Regular,08.02.2019,0,Material,Complete,Machine Shop Finished
+78047,5,7,Regular,08.02.2019,0,Material,Complete,Machine Shop Finished
+78967,1,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78967,2,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78967,3,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78967,4,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78967,5,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78967,6,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78967,7,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78967,8,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78967,9,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78967,10,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+75368,1,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+75368,2,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+79248,1,7,Regular,21.02.2019,0,Material,Complete,Scheduled/Released
+76965,1,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78565,1,7,High Priority,21.02.2019,0,Material,Complete,Machine Shop Started
+78759,1,7,Regular,08.02.2019,0,Material,Complete,Machine Shop Finished
+78759,2,7,Regular,08.02.2019,0,Material,Complete,Machine Shop Finished
+77784,1,7,Regular,15.03.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72089,1,7,Regular,03.04.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72089,2,7,Regular,03.04.2019,0,Material,Complete,Machine Shop Started
+72089,3,7,Regular,03.04.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72089,4,7,Regular,03.04.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72089,5,7,Regular,03.04.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72089,6,7,Regular,03.04.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72089,7,7,Regular,03.04.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72089,8,7,Regular,03.04.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78355,1,7,Regular,21.02.2019,0,Material,Complete,Scheduled/Released
+78355,2,7,Regular,21.02.2019,0,Material,Complete,Scheduled/Released
+78355,3,7,Regular,21.02.2019,0,Material,Complete,Scheduled/Released
+78355,4,7,Regular,21.02.2019,0,Material,Complete,Scheduled/Released
+78355,5,7,Regular,21.02.2019,0,Material,Complete,Scheduled/Released
+78355,6,7,Regular,21.02.2019,0,Material,Complete,Scheduled/Released
+78355,7,7,Regular,21.02.2019,0,Material,Complete,Scheduled/Released
+79282,1,7,Regular,21.02.2019,0,Material,Complete,Scheduled/Released
+78171,1,7,Regular,08.02.2019,0,Material+Cartridge,Complete,Machine Shop Finished
+73065,1,7,Regular,01.03.2019,0,Material,Complete,Scheduled/Released
+73065,2,7,Regular,01.03.2019,nan,Material,Complete,Scheduled/Released
+79037,1,7,Regular,05.02.2019,0,Material,Complete,Machine Shop Finished
+77440,1,7,Regular,01.02.2019,nan,+Cartridge,Complete,Machine Shop Finished
+79373,1,7,High Priority,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+79373,2,7,High Priority,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+79373,3,7,High Priority,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78030,1,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76372,1,7,Regular,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76372,2,7,Regular,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76372,3,7,Regular,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+70328,6,7,Priority,19.02.2019,nan,Material+Cartridge,Complete,Scheduled/Released
+70328,7,7,Priority,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+70328,8,7,Priority,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+70328,9,7,Priority,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+70328,10,7,Priority,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+70328,11,7,Priority,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+70328,12,7,Priority,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+70328,13,7,Priority,19.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77900,1,7,Regular,21.02.2019,0,Material,Complete,Machine Shop Started
+77900,2,7,Regular,21.02.2019,0,Material,Complete,Machine Shop Started
+77900,3,7,Regular,21.02.2019,0,Material,Complete,Machine Shop Started
+77900,4,7,Regular,21.02.2019,0,Material,Complete,Machine Shop Started
+77900,6,7,Regular,21.02.2019,0,Material,Complete,Machine Shop Started
+77900,7,7,Regular,21.02.2019,0,Material,Complete,Machine Shop Started
+77900,8,7,Regular,21.02.2019,0,Material,Complete,Machine Shop Started
+77900,9,7,Regular,21.02.2019,0,Material,Complete,Machine Shop Started
+77900,10,7,Regular,21.02.2019,0,Material,Complete,Machine Shop Started
+72722,1,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72722,2,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72722,3,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72722,4,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72722,5,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72722,6,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72722,7,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72722,8,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72722,9,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72722,10,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+72722,11,7,Regular,15.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78768,1,7,Regular,04.02.2019,nan,Material,Complete,Machine Shop Finished
+79011,2,7,Regular,01.02.2019,0,Material,Complete,Machine Shop Finished
+79011,3,7,Regular,01.02.2019,0,Material,Complete,Machine Shop Finished
+78360,1,7,High Priority,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78658,1,7,Regular,19.02.2019,0,Material,Complete,Machine Shop Started
+78825,1,7,High Priority,12.02.2019,0,Material+Cartridge,Complete,Machine Shop Finished
+78825,2,7,High Priority,12.02.2019,0,Material+Cartridge,Complete,Machine Shop Finished
+76853,1,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76853,2,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76853,3,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76853,4,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76853,5,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76853,6,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76853,7,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76853,8,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76853,9,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76853,10,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76853,11,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76853,12,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76853,13,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76853,14,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76853,15,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76853,16,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77693,4,7,Regular,05.02.2019,0,+Cartridge,Complete,Machine Shop Finished
+78142,1,7,Regular,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78142,2,7,Regular,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78142,3,7,Regular,21.02.2019,0,Material,Complete,Scheduled/Released
+78142,4,7,Regular,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76241,6,7,Regular,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76241,7,7,Regular,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76241,8,7,Regular,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76241,9,7,Regular,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76241,10,7,Regular,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+76285,2,7,Regular,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77211,1,7,Regular,08.02.2019,0,+Cartridge,Complete,Machine Shop Finished
+77211,2,7,Regular,08.02.2019,0,+Cartridge,Complete,Machine Shop Finished
+78408,1,7,Regular,18.02.2019,0,Material+Cartridge,Complete,Machine Shop Finished
+78408,2,7,Regular,18.02.2019,0,Material+Cartridge,Complete,Machine Shop Finished
+78408,3,7,Regular,18.02.2019,0,Material+Cartridge,Complete,Machine Shop Finished
+78174,1,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,2,7,Regular,20.02.2019,0,Material,Complete,Scheduled/Released
+78174,3,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,4,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,5,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,6,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,7,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,10,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,11,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,12,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,13,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,14,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,15,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,16,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,17,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,18,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,19,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,20,7,Regular,20.02.2019,0,Material,Complete,Scheduled/Released
+78174,21,7,Regular,20.02.2019,0,Material,Complete,Scheduled/Released
+78174,22,7,Regular,20.02.2019,0,Material,Complete,Scheduled/Released
+78174,23,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,24,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,25,7,Regular,20.02.2019,0,Material,Complete,Scheduled/Released
+78174,26,7,Regular,20.02.2019,0,Material,Complete,Scheduled/Released
+78174,27,7,Regular,20.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78174,29,7,Regular,20.02.2019,0,Material,Complete,Scheduled/Released
+77898,1,7,Regular,05.02.2019,0,Material,Complete,Machine Shop Finished
+75556,1,7,High Priority,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+75556,2,7,High Priority,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+75556,3,7,High Priority,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+75556,4,7,High Priority,21.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77314,1,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77314,2,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77314,3,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77314,4,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77314,5,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77314,6,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77314,7,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77790,1,7,Regular,22.02.2019,0,Material,Complete,Scheduled/Released
+77790,2,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77790,3,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77790,4,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77790,5,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77790,6,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77790,7,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+77790,8,7,Regular,22.02.2019,0,Material+Cartridge,Complete,Scheduled/Released
+78553,1,7,Regular,04.02.2019,0,Material,Complete,Machine Shop Finished
+78624,1,7,Regular,05.03.2019,0,Material,Complete,Machine Shop Started
+78624,2,7,Regular,05.03.2019,0,Material,Complete,Machine Shop Started
+78624,3,7,Regular,05.03.2019,0,Material,Complete,Machine Shop Started
+78624,4,7,Regular,05.03.2019,0,Material,Complete,Machine Shop Started

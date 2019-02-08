@@ -209,6 +209,13 @@ def read_data_assembly(filename, today):
                     line += str(row[i])
                     line +=','
                 line += '\n' 
+        elif row['Order'] in bad_orders:
+            if not ( row['Status'] in status_rank and row['Complete/Partial'] == 'Complete' and  (pd.isnull(row['ISSUE']) or row['ISSUE'] == '0')):
+                bad_orders.append(row['Order'])
+                for i in dbug_value:
+                    line += str(row[i])
+                    line +=','
+                line += '\n' 
     line = ''.join(line)
     d_file.write(line)
 
