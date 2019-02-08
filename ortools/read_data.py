@@ -175,6 +175,8 @@ def read_data_assembly(filename, today):
     #print("{} and  {} ".format(assembly_input['Production Group'], assembly_input['Order']))
     try:
         d_file= open("debug.csv","w")
+        status_7= open("status_7.csv","w")
+        status_7.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials \n')
         d_file.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials \n')
     except PermissionError:
         print('Please close the file debug.csv and return the program')
@@ -227,6 +229,7 @@ def read_data_assembly(filename, today):
                     formatter_string = "%d.%m.%Y" 
                     datetime_object = datetime.strptime(getattr(sub,'Sched. Ship Date'), formatter_string)
                     setattr(sub,'ship_date', datetime_object.date())
+                    setattr(sub,'real_stat', sub.Status)
                     setattr(sub,'delta', (datetime_object - today).days)
                     value = [0,(datetime_object - today).days]
                     ID = int(str(int(row['Order'])) + str(max(value)))
@@ -277,17 +280,29 @@ def read_data_assembly(filename, today):
                     #    bad_orders.append(row['Order'])
             except ValueError:
                 pass
+    line2 = []
     for index, ord in map_order.items():
-              num = []
-              [num.append(s.Status) for s in ord.sections]
-              pri = []
-              [pri.append(s.priority) for s in ord.sections]
-              setattr(ord, 'Status', max(num))
-              setattr(ord, 'delta', ord.sections[0].delta)
-              setattr(ord, 'priority', min(pri))
-              if ord.Status < 7:
+            num = []
+            [num.append(s.Status) for s in ord.sections]
+            pri = []
+            [pri.append(s.priority) for s in ord.sections]
+            setattr(ord, 'Status', max(num))
+            setattr(ord, 'delta', ord.sections[0].delta)
+            setattr(ord, 'priority', min(pri))
+            if ord.Status == 7:
+                for s in ord.sections:
+                   if s.Status == 7:
+                        #print(s.Order)
+                        for i in dbug_value:
+                            line2 += str(getattr(s,i) )
+                            line2 +=','
+                        line2 += str(getattr(s,'real_stat'))
+                        line2 += '\n'
+            if ord.Status < 7:
                 setattr(ord, 'group', ord.sections[0].group)
                 solution.append(ord)
+    line2 = ''.join(line2)
+    status_7.write(line2)           
     #line = ''.join(line)
     #d_file.write(line)
     print('File input sucessfully')
