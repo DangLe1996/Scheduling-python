@@ -200,20 +200,21 @@ def read_data_assembly(filename, today):
         'Scheduled/Released': 4
 
         }
+
     line = []
     bad_orders = []
     good_value = ['0', float('NaN')]
     for index, row in assembly_input.iterrows():
         if row['Order'] not in bad_orders:
-            if not ( row['Status'] in status_rank and row['Complete/Partial'] == 'Complete' and  (pd.isnull(row['Issue']) or row['Issue'] == '0')):
-                bad_orders.append(row['Order'])
+            if not ( row['Status'] in status_rank and row['Complete/Partial'] == 'Complete' and  (pd.isnull(row['Issue']) or row['Issue'] == 0)):
+                bad_orders.append(int(row['Order']))
                 for i in dbug_value:
                     line += str(row[i])
                     line +=','
                 line += '\n' 
         elif row['Order'] in bad_orders:
-            if not ( row['Status'] in status_rank and row['Complete/Partial'] == 'Complete' and  (pd.isnull(row['Issue']) or row['Issue'] == '0')):
-                bad_orders.append(row['Order'])
+            if not ( row['Status'] in status_rank and row['Complete/Partial'] == 'Complete' and  (pd.isnull(row['Issue']) or row['Issue'] == 0)):
+                bad_orders.append(int(row['Order']))
                 for i in dbug_value:
                     line += str(row[i])
                     line +=','
@@ -276,6 +277,7 @@ def read_data_assembly(filename, today):
             
             except ValueError:
                 pass
+    print(len(bad_orders))
     line2 = []
     for index, ord in map_order.items():
             num = []
@@ -459,7 +461,7 @@ def main():
         ans = input("Press any button to exit")
         exit()
     #filename = input("Please enter assembly input file name in .csv format:  ")
-    filename  = 'feb8.csv'
+    filename  = 'file.csv'
     if read_data_assembly(filename, today):
        assign_date(solution,ofile, today)
     
