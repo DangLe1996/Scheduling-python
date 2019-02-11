@@ -1,166 +1,367 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Dec 31 14:20:26 2018
 
+@author: baoda
+"""
 
+from __future__ import print_function
+import pandas as pd
+import collections
+import math
+from operator import attrgetter, itemgetter
+import time
+from datetime import datetime,date, timedelta 
 
-#from __future__ import print_function
-#import pandas as pd
-#import collections
-#from random import randint
+# Import Python wrapper for or-tools CP-SAT solver.
 
-## Import Python wrapper for or-tools CP-SAT solver.
-#from ortools.sat.python import cp_model
+class order():
+    def __init__(self, number):
+        self.number = number
+        self.a_time = 0
+        self.Status = 0
+        self.sections = []
+    def add_section(self,value):
+        self.sections.append(value)
+class sub_order():
+    priority_rank = {
+    'High Priority': 1,
+    'Priority' : 2,
+    'Regular': 3
 
+    }
+    status_rank = {
+        'Wiring Started': 1,
+        'Machine Shop Finished' : 2,
+        'Machine Shop Started': 3,
+        
 
+       }
+    dbug_value = ['Order', 'Line','Status','Priority', 
+                  'Ship_date', 'Issue','Missing',
+                 'Complete' ]
 
-#df = pd.read_csv('assembly-input-1.csv')
-#number_of_orders = len(df)
+    fields = ['Order', 'Line', 'Status', 'Scheduled Ship Date',
+             'Remaining Time', 'Sched Date Priority' , 
+             'Issue','Missing Materials', 'Assembly Line', 
+             'Complete/Partial' ]
+    fields_input = {
+        'Order': 'Order', 
+        'Line': 'Line',
+        'Status': 'Status', 
+        'Time' : 'Remaining Time',
+        'Priority': 'Sched Date Priority', 
+        'Ship_date': 'Scheduled Ship Date', 
+        'Issue': 'Issue', 
+        'Missing': 'Missing Materials', 
+        'Complete': 'Complete/Partial',
+        'Group' : 'Assembly Line'
+        }
 
-
-
-#class assemly_group():
-#     useage = 0
-#     def __init__(self, number):
-#         self.number = int(number)
-       
-#     def update(self,value):
-#         self.useage = self.useage + int(value)
-
-
-
-#all_groups = []
-#useage = []
-
-
-#for i in range(4):
-#    group = []
-#    group.append(i)
-#    group.append(0)
-#    all_groups.append(assemly_group(i))
-#    useage.append(group)
-
-
-
-
-
-##def assembly_schedule():
-##    #all_orders.sort(key = lambda x: x.priority, reverse = False)
-##    for i in range(len(all_orders)):
-##        group = randint(0,3)
-##        all_orders[i].set_group(group)
-##        all_groups[group].update( all_orders[i].a_time)
-
-
-
-#def MinimalJobshopSat():
-#    #Create the model
-#    model = cp_model.CpModel()
-#    machine_count = 1 + max(task[0] for job in jobs_data for task in job)
-#    all_machines = range(machine_count)
-#    jobs_count = len(jobs_data) #count how many jobs there is
-#    all_jobs = range(jobs_count)
-
-#    #Compute horizon
-#    horizon = sum(task[1]  for job in jobs_data for task in job)
-#    print(horizon)
-
-#    #data type container
-#    #create a namedtuple that name task_type with three input parameter of start, end and interval.
-#    task_type = collections.namedtuple('task_type', 'start end interval')
-#    #similar to the one above, with three variables of start, job and index. 
-#    #assigned task type is used to store solution. Not needed to define the problem. 
-#    assigned_task_type = collections.namedtuple('assigned_task_type', 'start job index')
-
-#    #create jobs
-#    all_tasks = {} #dictionary
-#    for job in all_jobs:
-#        for task_id, task in enumerate(jobs_data[job]): #enumerator
-#            start_var = model.NewIntVar(0,horizon,'start_%i_%i' %(job, task_id))
-#            duration = task[1]
-#            end_var = model.NewIntVar(0,horizon,'end_%i_%i' %(job, task_id))
-#            interval_var = model.NewIntervalVar(start_var,duration,end_var,'interval_%i_%i'%(job,task_id))
-#            #use job and task_id to create a dictionary
-#            all_tasks[job,task_id] = task_type(start = start_var, end = end_var, interval = interval_var)
+    def __init__(self, index ):
+        self.index = index
     
-#    #create and add disjunctive constraints
-#    for machine in all_machines:
-#        intervals = []
-#        for job in all_jobs:
-#            for task_id, task in enumerate(jobs_data[job]):
-#                if task[0] == machine:
-#                    intervals.append(all_tasks[job,task_id].interval)
-#        #add nonoverlapping constraint for each machine. 
-#        model.AddNoOverlap(intervals)
 
-#    #Add precedent constraint
-#    for job in all_jobs:
-#        for task_id in range(0,len(jobs_data[job]) -1 ):
-#            model.Add(all_tasks[job, task_id + 1].start >= all_tasks[job, task_id].end)
+class groups():
+    capacity = {}
+    @classmethod
+    def capacity_input(cls,filename):
+        try:
+            capacity_input = pd.read_csv(filename, skipinitialspace=True)
+        except FileNotFoundError:
+            print('Invalid file input or file does not exist, please check again')
+            return 0
+        for index, row in capacity_input.iterrows():
+            cls.capacity[row["Group"]] = row["Capacity"]
 
-#    #makespan objective
-#    obj_var = model.NewIntVar(0,horizon,'makespan')
-#    model.AddMaxEquality(obj_var,[all_tasks[(job,len(jobs_data[job]) - 1)].end for job in all_jobs])
-#    model.Minimize(obj_var)
-
-#    #solve_model
+class assembly_scheduling():
+    bad_orders = []
+    map_order = {}
+    solution =[]
+    today = 0
+    order_rank = {
+        1: [], 
+        2: [], 
+        3: [], 
+        4: [], 
+        5: [], 
+        6: [], 
+        7: []
+        
+        }
+    @classmethod
+    def read_data_excel(cls,filename, today):
+        formatter_string = "%d.%m.%Y" 
    
-#    solver = cp_model.CpSolver()
-#    solver.parameters.max_time_in_seconds = 30.0
-#    status = solver.Solve(model)
+        today = pd.to_datetime(today, format=formatter_string)
+        cls.today = today
+        line = []
+        data_file = pd.read_excel(filename, sheet_name='Production Meeting')
+        try:
+            d_file= open("debug.csv","w")
+            status_7= open("status_7.csv","w")
+            status_7.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials \n')
+            d_file.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials \n')
+        except PermissionError:
+            print('Please close the file debug.csv and return the program')
+            ans = input("Press any button to exit")
+            exit()
+        for index, row in data_file.iterrows():
+            if not ( row[sub_order.fields_input['Status']] in sub_order.status_rank and row[sub_order.fields_input['Complete']] == 'Complete' and  (pd.isnull(row[sub_order.fields_input['Issue']]) or row[sub_order.fields_input['Issue']] == 0)):
+                if row[sub_order.fields_input['Order']] not in cls.bad_orders:
+                    cls.bad_orders.append(row[sub_order.fields_input['Order']])
+                for i in sub_order.dbug_value:
+                    line += str(row[sub_order.fields_input[i]])
+                    line +=','
+                line += '\n' 
+        line = ''.join(line)
+        d_file.write(line)
+        #print(line)
+        for index, row in data_file.iterrows():
+            if row['Order'] not in cls.bad_orders:
+                try:
+                    r = float(row['Remaining Time'])
+                    sub = sub_order(index)
+                    for index, value in sub_order.fields_input.items():
+                        setattr(sub, index, row[value])
+                    value = [0, sub.Ship_date.dayofyear - today.dayofyear]
+                    setattr(sub,'delta', max(value ))
+                    ID = int(str(sub.Order) + str(max(value)))
+                    if(ID not in cls.map_order):
+                        ord = order(ID)
+                        setattr(ord, 'priority', 5)
+                        cls.map_order[ID] = ord
+                    setattr(sub,'ID', ID )
+                    if sub_order.status_rank[sub.Status] == 1 and  pd.isnull(sub.Missing):
+                        setattr(sub,'assembly_seq', 1 )
+                    elif sub_order.status_rank[sub.Status] == 2:
+                        try:
+                            if pd.isnull(sub.Missing):
+                                setattr(sub,'assembly_seq', 2 ) 
+                            elif sub.Missing == '=+Cartridge':
+                                setattr(sub,'assembly_seq', 3 )
+                            else :setattr(sub,'assembly_seq', 7 )
+                        except TypeError:
+                            setattr(sub,'assembly_seq', 7 )
+                    elif sub_order.status_rank[sub.Status] == 3:
+                        if sub.Missing == '=+lens' or pd.isnull(sub.Missing):
+                            setattr(sub,'assembly_seq', 4 )   
+                        
+                        elif sub.Missing == 'Material+Cartridge':
+                            setattr(sub,'assembly_seq', 5 )  
+                        
+                        elif sub.Missing == 'Material+lens+Cartridge+Housing':
+                            setattr(sub,'assembly_seq', 6 )
+                        
+                        else :setattr(sub,'assembly_seq', 7 )
+                    else :setattr(sub,'assembly_seq', 7 )
+                            
+                    cls.map_oder_input(sub)
+                except ValueError:
+                    pass    
+        for index, ord in cls.map_order.items():
+            line2 = []
+            num = []
+            [num.append(s.assembly_seq) for s in ord.sections]
+            setattr(ord, 'Status', max(num))
+            setattr(ord, 'delta', ord.sections[0].delta)
+            if ord.Status == 7:
+                for s in ord.sections:
+                   if s.assembly_seq == 7:
+                        for i in sub_order.dbug_value:
+                            line2 += str(getattr(s,i) )
+                            line2 +=','
+                        line2 += '\n'
+            if ord.Status < 7:
+                cls.order_rank[ord.Status].append(ord)
+                setattr(ord, 'group', ord.sections[0].Group)
+                cls.solution.append(ord)
+        line2 = ''.join(line2)
+        status_7.write(line2)           
+        print('File input sucessfully')
+       
 
-#    if status == cp_model.FEASIBLE:
-#        print('Feasible Schedule Length: %i' % solver.ObjectiveValue())
-#        print()
-#         # Create one list of assigned tasks per machine.
-#        assigned_jobs = [[] for _ in all_machines]
-#        for job in all_jobs:
-#            for task_id, task in enumerate(jobs_data[job]):
-#                machine = task[0]
-#                assigned_jobs[machine].append(
-#                    assigned_task_type(
-#                        start=solver.Value(all_tasks[job, task_id].start),
-#                        job=job,
-#                        index=task_id))
 
-#        disp_col_width = 10
-#        sol_line = ''
-#        sol_line_tasks = ''
+    @classmethod
+    def assign_date_before(cls,groups, output):
+        try:
+            ofile= open(output,"w")
+            ofile.write('Order, Line, Assigned Group, Start Date, Finish day, Ship day, Assembly Time, Status \n')
+        except PermissionError:
+            print('Please close the file output.csv and return the program')
+            ans = input("Press any button to exit")
+            exit()
+        output = ['Order', 'Line', 'Group','start_day', 'finish_day', 'Ship_date', 'Time', 'Status']
+        cls.solution.sort(key = attrgetter('group', 'Status','delta', 'priority' ), reverse=False)
+        line = []
+        useage_after= {
+            1: 0, 
+            4: 0,
+            7: 0,
+            10: 0, 
+            12: 0,
+            15:0, 
+            18:0
+            }
+        if len(cls.solution) > 0:
+            for o in cls.solution:
+                for s in o.sections:
+                    s.Group = int(s.Group)
+                    start =  useage_after[s.Group]
+                    useage_after[s.Group]  = useage_after[s.Group] + math.ceil(float(s.Time))
+                    finish =  useage_after[s.Group]
+                    start = math.floor((start)/ (60*groups.capacity[s.Group]))
+                    finish =  math.floor((finish)/ (60*groups.capacity[s.Group]))
+                    setattr(s, 'start_day', cls.today + pd.Timedelta(start, unit='d')  )
+                    setattr(s, 'finish_day', cls.today + pd.Timedelta(finish, unit='d')  )
+                    for i in output:
+                        line += str(getattr(s,i))
+                        line += ","   
+                    line += "\n"
+                    line = ''.join(line)
+            ofile.write(line)
+            print('Useage per group')
+            print(useage_after)
 
-#        print('Feasible Schedule', '\n')
+     
+    @classmethod
+    def map_oder_input(cls,sub):
+        if sub not in cls.map_order[sub.ID].sections:
+            if cls.map_order[sub.ID].priority > sub_order.priority_rank [sub.Priority] :
+                cls.map_order[sub.ID].priority = sub_order.priority_rank [sub.Priority]
+            if sub_order.status_rank[sub.Status] > cls.map_order[sub.ID].Status:
+                cls.map_order[sub.ID].Status = sub_order.status_rank[sub.Status] 
+            cls.map_order[sub.ID].add_section(sub)
+            try:
+                cls.map_order[sub.ID].a_time += math.ceil(sub.Time)
+            except TypeError or ValueError :
+                 pass
 
-#        for machine in all_machines:
-#            # Sort by starting time.
-#            assigned_jobs[machine].sort()
-#            sol_line += 'Machine ' + str(machine) + ': '
-#            sol_line_tasks += 'Machine ' + str(machine) + ': '
+    @classmethod
+    def read_data_assembly(cls,filename, today):
+        today = datetime.strptime( today,"%d/%m/%Y" )
+        fields = ['Job no.','Order', 'Line', 'Status', 'Sched. Ship Date',
+                 'Real Status' , 'Real Time', 'Promised' , 'ISSUE',
+                 'Missing Materials', 'Production Group', 'Production Group', 'Complete/Partial' ]
+        try:
+            assembly_input = pd.read_csv(filename, skipinitialspace=True, usecols=fields)
+            d_file= open("debug.csv","w")
+            d_file.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials \n')
+        except FileNotFoundError:
+            print('Invalid file input or file does not exist, please check again')
+            return 0
+    
 
-#            for assigned_task in assigned_jobs[machine]:
-#                name = 'job_%i_%i' % (assigned_task.job, assigned_task.index)
-#                # Add spaces to output to align columns.
-#                sol_line_tasks += name + ' ' * (disp_col_width - len(name))
-#                start = assigned_task.start
-#                duration = jobs_data[assigned_task.job][assigned_task.index][1]
+        line = []
+        good_value = ['0', float('NaN')]
+        dbug_value = ['Order', 'Line','Status','Promised', 'Sched. Ship Date', 'ISSUE','Missing Materials', 'Complete/Partial'  ]
+        for index, row in assembly_input.iterrows():
+            if row['Order'] not in cls.bad_orders:
+                if not ( row['Status'] in sub_order.status_rank and row['Complete/Partial'] == 'Complete' and  (pd.isnull(row['ISSUE']) or row['ISSUE'] == '0')):
+                    cls.bad_orders.append(row['Order'])
+                    for i in dbug_value:
+                        line += str(row[i]) + ','
+                    line += '\n' 
+        line = ''.join(line)
+        d_file.write(line)
+        for index, row in assembly_input.iterrows():
+            if row['Order'] not in cls.bad_orders:
+                    if(row['Order'] not in cls.map_order):
+                        ord = order(row['Order'])
+                        setattr(ord, 'priority', 5)
+                        cls.map_order[row['Order']] = ord
+                    sub = sub_order(index)
+            
+                    for value in fields:
+                        setattr(sub, value, row[value])
+                    setattr(sub, 'priority', sub_order.priority_rank[sub.Promised])
+                    formatter_string = "%d.%m.%Y" 
+                    datetime_object = datetime.strptime(getattr(sub,'Sched. Ship Date'), formatter_string)
+                    subtract = abs((datetime_object - today).days)
+                    setattr(sub,'ship_date', datetime_object.date())
+                    setattr(sub,'days_from_today', subtract)
+                    setattr(sub,'real_time', getattr(sub,'Real Time'))
+                    quali = list(map(int, getattr(sub,'Production Group').split(',')))
+                    setattr(sub, 'qualified_groups',quali)
+                    value = [0, subtract]
+                    ID = str(row['Order']) + str(row['Line']) + str(max(value))
+                    setattr(sub, 'ID',int(ID))
+                    if sub_order.status_rank[sub.Status] == 1 :
+                        sub.Status = 1
+                    elif sub_order.status_rank[sub.Status] == 2:
+                        try:
+                            if math.isnan(getattr(sub,'Missing Materials')):
+                                sub.Status = 2   
+                            elif getattr(sub,'Missing Materials') == '=+Cartridge':
+                                sub.Status = 3
+                            else :sub.Status = 7
+                        except TypeError:
+                            sub.Status = 7
+                    elif sub_order.status_rank[sub.Status] == 3:
+                        if getattr(sub,'Missing Materials') == '=+lens':
+                            sub.Status = 4     
+                        if getattr(sub,'Missing Materials') == 'Material+Cartridge':
+                            sub.Status = 5  
+                        if getattr(sub,'Missing Materials') == 'Material+lens+Cartridge+Housing':
+                            sub.Status = 6
+                        else :sub.Status = 7
+                    else :sub.Status = 7
+                    cls.map_oder_input(sub)
+        print('File input sucessfully')
+        for index, ord in cls.map_order.items():
+            cls.order_rank[ord.Status].append(ord);
+        return cls.order_rank
+    def schedule(all_orders, groups):
+        if len(all_orders) > 0:
+            horizon = 5
+            from ortools.linear_solver import pywraplp
+            solver = pywraplp.Solver('CoinsGridCLP',
+                                     pywraplp.Solver.CBC_MIXED_INTEGER_PROGRAMMING)
+            x = {}
+            y = {}
+            z = {}
+            variable_list = []
+            for o in all_orders:
+                for i in o.sections:
+                    for j in i.qualified_groups:
+                        x[(i.ID,j)] = solver.IntVar(0,1, 'x[%i,%i]' % (i.ID,j))
+                        #variable_list.append(x[(i.ID,j)])
+                    for j in range(horizon):
+                        y[(i.ID,j)] = solver.IntVar(0,1, 'y[%i,%i]' % (i.ID,j))
+                        #variable_list.append(y[(i.ID,j)])
+                        for k in i.qualified_groups:
+                            z[(i.ID,j,k)] = solver.IntVar(0,int( i.real_time), 'z[%i,%i,%i]' % (i.ID,j,k))
+                            variable_list.append(z[(i.ID,j,k)])
+    
+            makespan = solver.IntVar(0,horizon, 'makespan')
+            days_used = solver.IntVar(0,10000, 'days_used')
+            for o in all_orders:
+                for i in o.sections:
+                    solver.Add(solver.Sum([x[(i.ID,j)] for j in i.qualified_groups]) == 1) #one group
+                    solver.Add(solver.Sum([y[(i.ID,j)] for j in range(horizon)]) >= 1) #multiple days
+                    [solver.Add(makespan >= y[(i.ID,j)]*j) for j in range(horizon)]
+                    [solver.Add(z[(i.ID,j,k)] <= i.real_time *x[(i.ID,k)]) for j in range(horizon) for k in i.qualified_groups]
+                    [solver.Add(z[(i.ID,j,k)] <= i.real_time *y[(i.ID,j)]) for j in range(horizon) for k in i.qualified_groups]
+                    solver.Add(solver.Sum([z[(i.ID,j,k)]for j in range(horizon) for k in i.qualified_groups]) == int( i.real_time))
+            solver.Add(days_used == solver.Sum([y[(i.ID,j)]for j in range(horizon) for o in all_orders for i in o.sections]) )
+            for k, value in groups.capacity.items():
+                expr = []
+                for j in range(horizon):
+                    for o in all_orders:
+                        for i in o.sections:
+                            if k in i.qualified_groups:
+                                expr.append(z[(i.ID,j,k)])
+                    solver.Add(solver.Sum(expr[r] for r in range(len(expr))) <= value*60)
+                    expr.clear()
 
-#                sol_tmp = '[%i,%i]' % (start, start + duration)
-#                # Add spaces to output to align columns.
-#                sol_line += sol_tmp + ' ' * (disp_col_width - len(sol_tmp))
 
-#            sol_line += '\n'
-#            sol_line_tasks += '\n'
-
-#        print(sol_line_tasks)
-#        print('Task Time Intervals\n')
-#        print(sol_line)
-
-#    if status == cp_model.OPTIMAL:
-#        # Print out makespan.
-#        print('Optimal Schedule Length: %i' % solver.ObjectiveValue())
-#        print()
-
-
-
-
-
-##assembly_schedule()
-
-
-##print(df['Current Status'])
-
+            solver.Minimize(makespan + days_used)
+            #solver.Minimize(makespan )
+            solver.Solve()
+            best = round(makespan.SolutionValue())
+            print(round(days_used.SolutionValue()))
+            print(best)
+        #for variable in variable_list:
+        #    if variable.solution_value() > 0:
+        #        print(('%s = %f' % (variable.name(), variable.solution_value())))
+      
