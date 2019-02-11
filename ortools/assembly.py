@@ -34,9 +34,30 @@ class sub_order():
         'Wiring Started': 1,
         'Machine Shop Finished' : 2,
         'Machine Shop Started': 3,
-        'Scheduled/Released': 4
+        
 
        }
+    dbug_value = ['Order', 'Line','Status','Priority', 
+                  'Ship_date', 'Issue','Missing',
+                 'Complete' ]
+
+    fields = ['Order', 'Line', 'Status', 'Scheduled Ship Date',
+             'Remaining Time', 'Sched Date Priority' , 
+             'Issue','Missing Materials', 'Assembly Line', 
+             'Complete/Partial' ]
+    fields_input = {
+        'Order': 'Order', 
+        'Line': 'Line',
+        'Status': 'Status', 
+        'Time' : 'Remaining Time',
+        'Priority': 'Sched Date Priority', 
+        'Ship_date': 'Scheduled Ship Date', 
+        'Issue': 'Issue', 
+        'Missing': 'Missing Materials', 
+        'Complete': 'Complete/Partial',
+        'Group' : 'Assembly Line'
+        }
+
     def __init__(self, index ):
         self.index = index
     
@@ -55,9 +76,9 @@ class groups():
 
 class assembly_scheduling():
     bad_orders = []
-    all_sections = []
     map_order = {}
     solution =[]
+    today = 0
     order_rank = {
         1: [], 
         2: [], 
@@ -68,17 +89,151 @@ class assembly_scheduling():
         7: []
         
         }
+    @classmethod
+    def read_data_excel(cls,filename, today):
+        formatter_string = "%d.%m.%Y" 
+   
+        today = pd.to_datetime(today, format=formatter_string)
+        cls.today = today
+        line = []
+        data_file = pd.read_excel(filename, sheet_name='Production Meeting')
+        try:
+            d_file= open("debug.csv","w")
+            status_7= open("status_7.csv","w")
+            status_7.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials \n')
+            d_file.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials \n')
+        except PermissionError:
+            print('Please close the file debug.csv and return the program')
+            ans = input("Press any button to exit")
+            exit()
+        for index, row in data_file.iterrows():
+            if not ( row[sub_order.fields_input['Status']] in sub_order.status_rank and row[sub_order.fields_input['Complete']] == 'Complete' and  (pd.isnull(row[sub_order.fields_input['Issue']]) or row[sub_order.fields_input['Issue']] == 0)):
+                if row[sub_order.fields_input['Order']] not in cls.bad_orders:
+                    cls.bad_orders.append(row[sub_order.fields_input['Order']])
+                for i in sub_order.dbug_value:
+                    line += str(row[sub_order.fields_input[i]])
+                    line +=','
+                line += '\n' 
+        line = ''.join(line)
+        d_file.write(line)
+        #print(line)
+        for index, row in data_file.iterrows():
+            if row['Order'] not in cls.bad_orders:
+                try:
+                    r = float(row['Remaining Time'])
+                    sub = sub_order(index)
+                    for index, value in sub_order.fields_input.items():
+                        setattr(sub, index, row[value])
+                    value = [0, sub.Ship_date.dayofyear - today.dayofyear]
+                    setattr(sub,'delta', max(value ))
+                    ID = int(str(sub.Order) + str(max(value)))
+                    if(ID not in cls.map_order):
+                        ord = order(ID)
+                        setattr(ord, 'priority', 5)
+                        cls.map_order[ID] = ord
+                    setattr(sub,'ID', ID )
+                    if sub_order.status_rank[sub.Status] == 1 and  pd.isnull(sub.Missing):
+                        setattr(sub,'assembly_seq', 1 )
+                    elif sub_order.status_rank[sub.Status] == 2:
+                        try:
+                            if pd.isnull(sub.Missing):
+                                setattr(sub,'assembly_seq', 2 ) 
+                            elif sub.Missing == '=+Cartridge':
+                                setattr(sub,'assembly_seq', 3 )
+                            else :setattr(sub,'assembly_seq', 7 )
+                        except TypeError:
+                            setattr(sub,'assembly_seq', 7 )
+                    elif sub_order.status_rank[sub.Status] == 3:
+                        if sub.Missing == '=+lens' or pd.isnull(sub.Missing):
+                            setattr(sub,'assembly_seq', 4 )   
+                        
+                        elif sub.Missing == 'Material+Cartridge':
+                            setattr(sub,'assembly_seq', 5 )  
+                        
+                        elif sub.Missing == 'Material+lens+Cartridge+Housing':
+                            setattr(sub,'assembly_seq', 6 )
+                        
+                        else :setattr(sub,'assembly_seq', 7 )
+                    else :setattr(sub,'assembly_seq', 7 )
+                            
+                    cls.map_oder_input(sub)
+                except ValueError:
+                    pass    
+        for index, ord in cls.map_order.items():
+            line2 = []
+            num = []
+            [num.append(s.assembly_seq) for s in ord.sections]
+            setattr(ord, 'Status', max(num))
+            setattr(ord, 'delta', ord.sections[0].delta)
+            if ord.Status == 7:
+                for s in ord.sections:
+                   if s.assembly_seq == 7:
+                        for i in sub_order.dbug_value:
+                            line2 += str(getattr(s,i) )
+                            line2 +=','
+                        line2 += '\n'
+            if ord.Status < 7:
+                cls.order_rank[ord.Status].append(ord)
+                setattr(ord, 'group', ord.sections[0].Group)
+                cls.solution.append(ord)
+        line2 = ''.join(line2)
+        status_7.write(line2)           
+        print('File input sucessfully')
+       
+
 
     @classmethod
+    def assign_date_before(cls,groups, output):
+        try:
+            ofile= open(output,"w")
+            ofile.write('Order, Line, Assigned Group, Start Date, Finish day, Ship day, Assembly Time, Status \n')
+        except PermissionError:
+            print('Please close the file output.csv and return the program')
+            ans = input("Press any button to exit")
+            exit()
+        output = ['Order', 'Line', 'Group','start_day', 'finish_day', 'Ship_date', 'Time', 'Status']
+        cls.solution.sort(key = attrgetter('group', 'Status','delta', 'priority' ), reverse=False)
+        line = []
+        useage_after= {
+            1: 0, 
+            4: 0,
+            7: 0,
+            10: 0, 
+            12: 0,
+            15:0, 
+            18:0
+            }
+        if len(cls.solution) > 0:
+            for o in cls.solution:
+                for s in o.sections:
+                    s.Group = int(s.Group)
+                    start =  useage_after[s.Group]
+                    useage_after[s.Group]  = useage_after[s.Group] + math.ceil(float(s.Time))
+                    finish =  useage_after[s.Group]
+                    start = math.floor((start)/ (60*groups.capacity[s.Group]))
+                    finish =  math.floor((finish)/ (60*groups.capacity[s.Group]))
+                    setattr(s, 'start_day', cls.today + pd.Timedelta(start, unit='d')  )
+                    setattr(s, 'finish_day', cls.today + pd.Timedelta(finish, unit='d')  )
+                    for i in output:
+                        line += str(getattr(s,i))
+                        line += ","   
+                    line += "\n"
+                    line = ''.join(line)
+            ofile.write(line)
+            print('Useage per group')
+            print(useage_after)
+
+     
+    @classmethod
     def map_oder_input(cls,sub):
-        if sub not in cls.map_order[sub.Order].sections:
-            if cls.map_order[sub.Order].priority > sub_order.priority_rank [getattr(sub,'Promised')] :
-                cls.map_order[sub.Order].priority = sub_order.priority_rank [getattr(sub,'Promised')]
-            if sub.Status > cls.map_order[sub.Order].Status:
-                cls.map_order[sub.Order].Status = sub.Status 
-            cls.map_order[sub.Order].add_section(sub)
+        if sub not in cls.map_order[sub.ID].sections:
+            if cls.map_order[sub.ID].priority > sub_order.priority_rank [sub.Priority] :
+                cls.map_order[sub.ID].priority = sub_order.priority_rank [sub.Priority]
+            if sub_order.status_rank[sub.Status] > cls.map_order[sub.ID].Status:
+                cls.map_order[sub.ID].Status = sub_order.status_rank[sub.Status] 
+            cls.map_order[sub.ID].add_section(sub)
             try:
-                cls.map_order[sub.Order].a_time += math.ceil(getattr(sub,'Real Time'))
+                cls.map_order[sub.ID].a_time += math.ceil(sub.Time)
             except TypeError or ValueError :
                  pass
 
