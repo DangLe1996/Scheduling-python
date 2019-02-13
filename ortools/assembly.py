@@ -39,7 +39,7 @@ class sub_order():
        }
     dbug_value = ['Order', 'Line','Status','Priority', 
                   'Ship_date', 'Issue','Missing',
-                 'Complete' ]
+                 'Complete', 'Resolve' ]
 
     fields = ['Order', 'Line', 'Status', 'Scheduled Ship Date',
              'Remaining Time', 'Sched Date Priority' , 
@@ -49,13 +49,14 @@ class sub_order():
         'Order': 'Order', 
         'Line': 'Line',
         'Status': 'Status', 
-        'Time' : 'Remaining Time',
+        'Time' : 'Real Time',
         'Priority': 'Sched Date Priority', 
-        'Ship_date': 'Scheduled Ship Date', 
-        'Issue': 'Issue', 
+        'Ship_date': 'Sched. Ship Date', 
+        'Issue': 'ISSUE', 
         'Missing': 'Missing Materials', 
         'Complete': 'Complete/Partial',
-        'Group' : 'Assembly Line'
+        'Group' : 'Production Group',
+        'Resolve': 'Issue Resolved'
         }
 
     def __init__(self, index ):
@@ -90,13 +91,13 @@ class assembly_scheduling():
         
         }
     @classmethod
-    def read_data_excel(cls,filename, today):
+    def read_data_excel(cls,filename, today, sheet):
         formatter_string = "%d.%m.%Y" 
    
         today = pd.to_datetime(today, format=formatter_string)
         cls.today = today
         line = []
-        data_file = pd.read_excel(filename, sheet_name='Production Meeting')
+        data_file = pd.read_excel(filename, sheet_name=sheet)
         try:
             d_file= open("debug.csv","w")
             status_7= open("status_7.csv","w")
@@ -107,7 +108,8 @@ class assembly_scheduling():
             ans = input("Press any button to exit")
             exit()
         for index, row in data_file.iterrows():
-            if not ( row[sub_order.fields_input['Status']] in sub_order.status_rank and row[sub_order.fields_input['Complete']] == 'Complete' and  (pd.isnull(row[sub_order.fields_input['Issue']]) or row[sub_order.fields_input['Issue']] == 0)):
+            if not ( row[sub_order.fields_input['Status']] in sub_order.status_rank and row[sub_order.fields_input['Complete']] == 'Complete' and  
+                    (pd.isnull(row[sub_order.fields_input['Issue']]) or row[sub_order.fields_input['Issue']] == 0) ):
                 if row[sub_order.fields_input['Order']] not in cls.bad_orders:
                     cls.bad_orders.append(row[sub_order.fields_input['Order']])
                 for i in sub_order.dbug_value:
@@ -115,12 +117,12 @@ class assembly_scheduling():
                     line +=','
                 line += '\n' 
         line = ''.join(line)
+        print('Number of bad orders are ', len(cls.bad_orders))
         d_file.write(line)
-        #print(line)
         for index, row in data_file.iterrows():
             if row['Order'] not in cls.bad_orders:
                 try:
-                    r = float(row['Remaining Time'])
+                    r = float(row[sub_order.fields_input['Time']])
                     sub = sub_order(index)
                     for index, value in sub_order.fields_input.items():
                         setattr(sub, index, row[value])
@@ -157,10 +159,13 @@ class assembly_scheduling():
                     else :setattr(sub,'assembly_seq', 7 )
                             
                     cls.map_oder_input(sub)
-                except ValueError:
-                    pass    
+                except Exception as e: 
+                    print('Order ', row['Order'], ' ', row['Line'], ' has bad input')
+                    print(e)
+                     
+        line2 = []
         for index, ord in cls.map_order.items():
-            line2 = []
+           
             num = []
             [num.append(s.assembly_seq) for s in ord.sections]
             setattr(ord, 'Status', max(num))
@@ -177,7 +182,8 @@ class assembly_scheduling():
                 setattr(ord, 'group', ord.sections[0].Group)
                 cls.solution.append(ord)
         line2 = ''.join(line2)
-        status_7.write(line2)           
+        status_7.write(line2)    
+        print('Number of good orders are ', len(cls.solution))
         print('File input sucessfully')
        
 
@@ -206,19 +212,22 @@ class assembly_scheduling():
         if len(cls.solution) > 0:
             for o in cls.solution:
                 for s in o.sections:
-                    s.Group = int(s.Group)
-                    start =  useage_after[s.Group]
-                    useage_after[s.Group]  = useage_after[s.Group] + math.ceil(float(s.Time))
-                    finish =  useage_after[s.Group]
-                    start = math.floor((start)/ (60*groups.capacity[s.Group]))
-                    finish =  math.floor((finish)/ (60*groups.capacity[s.Group]))
-                    setattr(s, 'start_day', cls.today + pd.Timedelta(start, unit='d')  )
-                    setattr(s, 'finish_day', cls.today + pd.Timedelta(finish, unit='d')  )
-                    for i in output:
-                        line += str(getattr(s,i))
-                        line += ","   
-                    line += "\n"
-                    line = ''.join(line)
+                    try:
+                        s.Group = int(s.Group)
+                        start =  useage_after[s.Group]
+                        useage_after[s.Group]  = useage_after[s.Group] + math.ceil(float(s.Time))
+                        finish =  useage_after[s.Group]
+                        start = math.floor((start)/ (60*groups.capacity[s.Group]))
+                        finish =  math.floor((finish)/ (60*groups.capacity[s.Group]))
+                        setattr(s, 'start_day', cls.today + pd.Timedelta(start, unit='d')  )
+                        setattr(s, 'finish_day', cls.today + pd.Timedelta(finish, unit='d')  )
+                        for i in output:
+                            line += str(getattr(s,i))
+                            line += ","   
+                        line += "\n"
+                        line = ''.join(line)
+                    except Exception as e: 
+                        pass
             ofile.write(line)
             print('Useage per group')
             print(useage_after)
@@ -364,4 +373,10 @@ class assembly_scheduling():
         #for variable in variable_list:
         #    if variable.solution_value() > 0:
         #        print(('%s = %f' % (variable.name(), variable.solution_value())))
-      
+def main():
+    assembly_scheduling.read_data_excel('feb11.xlsx', '12.02.2019','Production Meeting')
+    groups.capacity_input('capacity.csv')
+    assembly_scheduling.assign_date_before(groups,'output.csv')
+
+if __name__ == '__main__':
+    main()
