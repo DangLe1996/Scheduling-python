@@ -36,9 +36,6 @@
     <Content Include="capacity.csv">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="requirement.txt">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="Todo.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />

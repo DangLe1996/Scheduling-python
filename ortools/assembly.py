@@ -225,9 +225,10 @@ class assembly_scheduling():
                             line += str(getattr(s,i))
                             line += ","   
                         line += "\n"
-                        line = ''.join(line)
+                       
                     except Exception as e: 
                         pass
+            line = ''.join(line)
             ofile.write(line)
             print('Useage per group')
             print(useage_after)
