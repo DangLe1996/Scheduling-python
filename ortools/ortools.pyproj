@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>828956d7-6448-4e94-a6b5-b3c174554c5f</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>assembly.py</StartupFile>
+    <StartupFile>test_cases.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -31,9 +31,18 @@
     <Compile Include="main.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="test_cases.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="capacity.csv">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="old.txt">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="requirement.txt">
       <SubType>Code</SubType>
     </Content>
     <Content Include="Todo.txt" />

@@ -87,8 +87,6 @@ cnc_condition = ['CNC Holes', 'CNC MR', 'CNC Controls']
 sequence = ['saw', 'mill', 'punch', 'welding', 'body_a', 'lens']
 def read_data_machine(filename):
     SORT_ORDER = {}
-   
-    
     for index, i in enumerate(sequence):
             SORT_ORDER[i] = index
     fields = ['Order', 'Line', 'Status', 'Scheduled Ship Date', 'SD vs BOM', 'Saw Cycle Time', 'Welding Cycle Time', 'Lens Cycle Time'
