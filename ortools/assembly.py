@@ -41,10 +41,6 @@ class sub_order():
                   'Ship_date', 'Issue','Missing',
                  'Complete', 'Resolve' ]
 
-    fields = ['Order', 'Line', 'Status', 'Scheduled Ship Date',
-             'Remaining Time', 'Sched Date Priority' , 
-             'Issue','Missing Materials', 'Assembly Line', 
-             'Complete/Partial' ]
     fields_input = {
         'Order': 'Order', 
         'Line': 'Line',
@@ -61,7 +57,7 @@ class sub_order():
 
     def __init__(self, index ):
         self.index = index
-    
+        self.amount_assigned = {}
     
 
 class groups():
@@ -91,10 +87,10 @@ class assembly_scheduling():
         7: []
         
         }
+   
     @classmethod
     def read_data_excel(cls,filename, today, sheet):
         formatter_string = "%d.%m.%Y" 
-   
         today = pd.to_datetime(today, format=formatter_string)
         cls.today = today
         line = []
@@ -109,10 +105,22 @@ class assembly_scheduling():
             ans = input("Press any button to exit")
             exit()
         for index, row in data_file.iterrows():
-            if not ( row[sub_order.fields_input['Status']] in sub_order.status_rank and row[sub_order.fields_input['Complete']] == 'Complete'): 
-                if (not (pd.isnull(row[sub_order.fields_input['Issue']]) or row[sub_order.fields_input['Issue']] == 0)) or row[sub_order.fields_input['Resolve'] == True]:
-                    if row[sub_order.fields_input['Order']] not in cls.bad_orders:
-                        cls.bad_orders.append(row[sub_order.fields_input['Order']])
+            ID = str(row[sub_order.fields_input['Order']]) + str(max(0,row[sub_order.fields_input['Ship_date']].dayofyear))
+            if row[sub_order.fields_input['Status']] not in sub_order.status_rank and row[sub_order.fields_input['Complete']] == 'Complete':
+                if ID not in cls.bad_orders:
+                        cls.bad_orders.append(ID)
+                for i in sub_order.dbug_value:
+                        line += str(row[sub_order.fields_input[i]])
+                        line +=','
+                line += '\n'
+            elif not ( row[sub_order.fields_input['Status']] in sub_order.status_rank and row[sub_order.fields_input['Complete']] == 'Complete' and (pd.isnull(row[sub_order.fields_input['Issue']]) or row[sub_order.fields_input['Issue']] == 0)): 
+                allowed_status = ['Machine Shop Finished', 'Wiring Started', 'Packaging Finished', 'Given to Shipping']
+                if row[sub_order.fields_input['Complete']] == 'Partial' and row[sub_order.fields_input['Status']] in allowed_status and (pd.isnull(row[sub_order.fields_input['Issue']]) or row[sub_order.fields_input['Issue']] == 0):
+                    pass
+                elif ( row[sub_order.fields_input['Resolve']] == False):
+                    if ID not in cls.bad_orders:
+                        cls.bad_orders.append(ID)
+
                     for i in sub_order.dbug_value:
                         line += str(row[sub_order.fields_input[i]])
                         line +=','
@@ -121,19 +129,23 @@ class assembly_scheduling():
         print('Number of bad orders are ', len(cls.bad_orders))
         d_file.write(line)
         for index, row in data_file.iterrows():
-            if row['Order'] not in cls.bad_orders:
+            order_ID = str(row[sub_order.fields_input['Order']]) + str(max(0,row[sub_order.fields_input['Ship_date']].dayofyear))
+            if order_ID not in cls.bad_orders:
                 try:
                     r = float(row[sub_order.fields_input['Time']])
                     sub = sub_order(index)
                     for index, value in sub_order.fields_input.items():
                         setattr(sub, index, row[value])
-                    value = [0, sub.Ship_date.dayofyear - today.dayofyear]
-                    setattr(sub,'delta', max(value ))
-                    ID = int(str(sub.Order) + str(max(value)) )
+                    if type(sub.Group) == str:
+                        quali = list(map(int, sub.Group.split(',')))
+                        sub.Group = quali
+                    setattr(sub,'delta', max(0, sub.Ship_date.dayofyear - today.dayofyear))
+                    ID = int(str(sub.Order) + str(sub.delta) )
                     if(ID not in cls.map_order):
                         ord = order(ID)
                         setattr(ord, 'priority', 5)
                         setattr(ord,'assembly_seq', 7 )
+                        setattr(ord,'number', row[sub_order.fields_input['Order']] )
                         cls.map_order[ID] = ord
                     setattr(sub,'ID', ID )
                     if sub_order.status_rank[sub.Status] == 1 and  pd.isnull(sub.Missing):
@@ -166,10 +178,15 @@ class assembly_scheduling():
                         
                     else:
                         print('Order ', row['Order'], ' ', row['Line'], ' has bad input: ' , row[sub_order.fields_input['Time']])
+                except KeyError as e:
+                    pass
+                    #if str(e) in allowed_status:
+                    #    pass
+                    #else: print ('I got a KeyError - reason "%s"' % str(e))
                 except Exception as e: 
-                    print('Order ', row['Order'], ' ', row['Line'], ' has bad input')
-                    del cls.map_order[sub.ID]
-                    print(e)
+                        print('Order ', row['Order'], ' ', row['Line'], ' has bad value input')
+                        #del cls.map_order[sub.ID]
+                        print(e)
                      
         line2 = []
         for index, ord in cls.map_order.items():
@@ -190,7 +207,7 @@ class assembly_scheduling():
         status_7.write(line2)    
         print('Number of good orders are ', len(cls.solution))
         print('File input sucessfully')
-       
+        return 1
 
 
     @classmethod
@@ -239,6 +256,7 @@ class assembly_scheduling():
 
     @classmethod
     def assign_date_after(cls,groups, output):
+        import operator
         try:
             ofile= open(output,"w")
             ofile.write('Order, Line, Assigned Group, Start Date, Finish day, Ship day, Assembly Time, Status \n')
@@ -246,8 +264,10 @@ class assembly_scheduling():
             print('Please close the file output.csv and return the program')
             ans = input("Press any button to exit")
             exit()
+       
+        #sorted(cls.map_order.values(), key=operator.attrgetter('assembly_seq'))
+        #sorted(cls.map_order.items() , reverse=True, key=lambda x: x.assembly_seq)
         output = ['Order', 'Line', 'Group','start_day', 'finish_day', 'Ship_date', 'Time', 'Status']
-        cls.solution.sort(key = attrgetter('group', 'Status','delta', 'priority' ), reverse=False)
         line = []
         useage_after= {
             1: 0, 
@@ -258,28 +278,55 @@ class assembly_scheduling():
             15:0, 
             18:0
             }
-        if len(cls.solution) > 0:
-            for o in cls.solution:
-                for s in o.sections:
+        for index, list in assembly_scheduling.order_rank.items():
+            for order in list:
+                for s in order.sections:
                     try:
-                        s.Group = int(s.Group)
-                        start =  useage_after[s.Group]
-                        useage_after[s.Group]  = useage_after[s.Group] + math.ceil(float(s.Time))
-                        finish =  useage_after[s.Group]
-                        start = math.floor((start)/ (60*groups.capacity[s.Group]))
-                        finish =  math.floor((finish)/ (60*groups.capacity[s.Group]))
-                        setattr(s, 'start_day', cls.today + pd.Timedelta(start, unit='d')  )
-                        setattr(s, 'finish_day', cls.today + pd.Timedelta(finish, unit='d')  )
-                        for i in output:
-                            line += str(getattr(s,i))
-                            line += ","   
-                        line += "\n"
-                        line = ''.join(line)
-                    except Exception as e: 
+                        print(s.assigned_group)
+                        print('Order %i line %i' %(order.ID, s.ID))
+                        #[print('Amount assign on day %i is %i'%(getattr(s,'amount_assigned_%i'%(d)),d)) for d in range(order.start_day, order.finish_day)]
+                        #for key, amount in s.amount_assigned.items():
+                            #print(key , amount)
+                    except Exception as e:
+                        print(e)
                         pass
-            ofile.write(line)
-            print('Useage per group')
-            print(useage_after)
+            if index == 1:
+               break
+        #for key, order in cls.map_order.items():
+        #    try:
+                
+        #            #for i in output:
+        #            ##    line += str(getattr(s,i))
+        #            ##    line += ","   
+        #            ##line += "\n"
+        #    except Exception as e:
+        #        #print(e)
+        #        pass
+        line = ''.join(line)
+        ofile.write(line)
+        #    print('Useage per group')
+        #if len(cls.solution) > 0:
+        #    for o in cls.solution:
+        #        for s in o.sections:
+        #            try:
+        #                s.Group = int(s.Group)
+        #                start =  useage_after[s.Group]
+        #                useage_after[s.Group]  = useage_after[s.Group] + math.ceil(float(s.Time))
+        #                finish =  useage_after[s.Group]
+        #                start = math.floor((start)/ (60*groups.capacity[s.Group]))
+        #                finish =  math.floor((finish)/ (60*groups.capacity[s.Group]))
+        #                setattr(s, 'start_day', cls.today + pd.Timedelta(start, unit='d')  )
+        #                setattr(s, 'finish_day', cls.today + pd.Timedelta(finish, unit='d')  )
+        #                for i in output:
+        #                    line += str(getattr(s,i))
+        #                    line += ","   
+        #                line += "\n"
+        #                line = ''.join(line)
+        #            except Exception as e: 
+        #                pass
+        #    ofile.write(line)
+        #    print('Useage per group')
+        #    print(useage_after)
 
      
     @classmethod
@@ -294,80 +341,7 @@ class assembly_scheduling():
             except TypeError or ValueError :
                  pass
 
-    @classmethod
-    def read_data_assembly(cls,filename, today):
-        today = datetime.strptime( today,"%d/%m/%Y" )
-        fields = ['Job no.','Order', 'Line', 'Status', 'Sched. Ship Date',
-                 'Real Status' , 'Real Time', 'Promised' , 'ISSUE',
-                 'Missing Materials', 'Production Group', 'Production Group', 'Complete/Partial' ]
-        try:
-            assembly_input = pd.read_csv(filename, skipinitialspace=True, usecols=fields)
-            d_file= open("debug.csv","w")
-            d_file.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials \n')
-        except FileNotFoundError:
-            print('Invalid file input or file does not exist, please check again')
-            return 0
-    
-
-        line = []
-        good_value = ['0', float('NaN')]
-        dbug_value = ['Order', 'Line','Status','Promised', 'Sched. Ship Date', 'ISSUE','Missing Materials', 'Complete/Partial'  ]
-        for index, row in assembly_input.iterrows():
-            if row['Order'] not in cls.bad_orders:
-                if not ( row['Status'] in sub_order.status_rank and row['Complete/Partial'] == 'Complete' and  (pd.isnull(row['ISSUE']) or row['ISSUE'] == '0')):
-                    cls.bad_orders.append(row['Order'])
-                    for i in dbug_value:
-                        line += str(row[i]) + ','
-                    line += '\n' 
-        line = ''.join(line)
-        d_file.write(line)
-        for index, row in assembly_input.iterrows():
-            if row['Order'] not in cls.bad_orders:
-                    if(row['Order'] not in cls.map_order):
-                        ord = order(row['Order'])
-                        setattr(ord, 'priority', 5)
-                        cls.map_order[row['Order']] = ord
-                    sub = sub_order(index)
-            
-                    for value in fields:
-                        setattr(sub, value, row[value])
-                    setattr(sub, 'priority', sub_order.priority_rank[sub.Promised])
-                    formatter_string = "%d.%m.%Y" 
-                    datetime_object = datetime.strptime(getattr(sub,'Sched. Ship Date'), formatter_string)
-                    subtract = abs((datetime_object - today).days)
-                    setattr(sub,'ship_date', datetime_object.date())
-                    setattr(sub,'days_from_today', subtract)
-                    setattr(sub,'real_time', getattr(sub,'Real Time'))
-                    quali = list(map(int, getattr(sub,'Production Group').split(',')))
-                    setattr(sub, 'qualified_groups',quali)
-                    value = [0, subtract]
-                    ID = str(row['Order']) + str(row['Line']) + str(max(value))
-                    setattr(sub, 'ID',int(ID))
-                    if sub_order.status_rank[sub.Status] == 1 :
-                        sub.Status = 1
-                    elif sub_order.status_rank[sub.Status] == 2:
-                        try:
-                            if math.isnan(getattr(sub,'Missing Materials')):
-                                sub.Status = 2   
-                            elif getattr(sub,'Missing Materials') == '=+Cartridge':
-                                sub.Status = 3
-                            else :sub.Status = 7
-                        except TypeError:
-                            sub.Status = 7
-                    elif sub_order.status_rank[sub.Status] == 3:
-                        if getattr(sub,'Missing Materials') == '=+lens':
-                            sub.Status = 4     
-                        if getattr(sub,'Missing Materials') == 'Material+Cartridge':
-                            sub.Status = 5  
-                        if getattr(sub,'Missing Materials') == 'Material+lens+Cartridge+Housing':
-                            sub.Status = 6
-                        else :sub.Status = 7
-                    else :sub.Status = 7
-                    cls.map_oder_input(sub)
-        print('File input sucessfully')
-        for index, ord in cls.map_order.items():
-            cls.order_rank[ord.Status].append(ord);
-        return cls.order_rank
+ 
 
 
     def schedule(all_orders, groups):
@@ -376,77 +350,102 @@ class assembly_scheduling():
             from ortools.linear_solver import pywraplp
             solver = pywraplp.Solver('CoinsGridCLP',
                                      pywraplp.Solver.CBC_MIXED_INTEGER_PROGRAMMING)
-            x = {} #assign sub order to a group
-            y = {} #assign order to date
-            z = {} #amount of sub order assign to group g
-            f = {} #the flow time of order in the system
-            h = {} #finish time of order
+            sub_to_group = {} #assign sub order to a group
+            order_to_date = {} #assign order to date
+            sub_amount_to_group = {} #amount of sub order assign to group g
+            flow_time = {} #the flow time of order in the system
+            finish_time_order = {} #finish time of order
+            order_lateness = {} #finish time of order
             variable_list = []
             for o in all_orders:
-                f[o.ID] = solver.IntVar(0,horizon, 'flow[%i]'  %(o.ID))
-                h[o.ID] = solver.IntVar(0,horizon, 'finish[%i]'  %(o.ID))
+                flow_time[o.ID] = solver.IntVar(0,horizon, 'flow[%i]'  %(o.ID))
+                finish_time_order[o.ID] = solver.IntVar(0,horizon, 'finish[%i]'  %(o.ID))
+                order_lateness[o.ID] = solver.IntVar(0,horizon, 'late[%i]'  %(o.ID))
                 for j in range(horizon):
-                        y[(o.ID,j)] = solver.IntVar(0,1, 'y[%i,%i]'  %(o.ID,j))
-                        variable_list.append(y[(o.ID,j)])
+                        order_to_date[(o.ID,j)] = solver.IntVar(0,1, 'y[%i,%i]'  %(o.ID,j))
+                        variable_list.append(order_to_date[(o.ID,j)])
                 for i in o.sections:
-                    if type(i.Group) == list:
-                        x = {(i.ID,j): solver.IntVar(0,1, 'x[%i,%i]' % (i.ID,j)) for j in i.Group}
-                    else:
-                        x[(i.ID,i.Group)] = solver.IntVar(0,1,'x%i%i' %(i.ID,i.Group))
+                    try:
+                        for j in i.Group:
+                            sub_to_group[(i.ID,j)] = solver.IntVar(0,1, 'x[%i,%i]' % (i.ID,j))
+                    except:
+                        sub_to_group[(i.ID,i.Group)] = solver.IntVar(0,1,'x%i%i' %(i.ID,i.Group))
                     for j in range(horizon):
-                        #y[(i.ID,j)] = solver.IntVar(0,1, 'y[%i,%i]'  %(i.ID,j))
-                        #variable_list.append(y[(i.ID,j)])
-                        if type(i.Group) == list:
-                            z = {(i.ID,j,k): solver.IntVar(0,int( i.Time), 'z[%i,%i,%i]' % (i.ID,j,k)) for k in i.Group}
-                        else: z[(i.ID,j,i.Group)] = solver.IntVar(0,max(0,int(i.Time)), 'z[%i,%i,%i]' % (i.ID,j,i.Group))
-                        #for k in i.group:
-                        #    z[(i.ID,j,k)] = solver.IntVar(0,int( i.real_time), 'z[%i,%i,%i]' % (i.ID,j,k))
-                        #variable_list.append(z[(i.ID,j,k)])
+
+                        try:
+                            for k in i.Group:
+                                sub_amount_to_group[(i.ID,j,k)] = solver.IntVar(0,max(0,int(i.Time)), 'z[%i,%i,%i]' % (i.ID,j,k))
+                        except:
+                            sub_amount_to_group[(i.ID,j,i.Group)] = solver.IntVar(0,max(0,int(i.Time)), 'z[%i,%i,%i]' % (i.ID,j,i.Group))
+                    
            
             makespan = solver.IntVar(0,horizon, 'makespan')
             days_used = solver.IntVar(0,1000, 'days_used')
+            total_lateness = solver.IntVar(0,1000, 'total_lateness')
             for o in all_orders:
-                [solver.Add(y[(o.ID,j)]*j + f[o.ID] >= y[(o.ID,j_prime)]* j_prime) for j in range(horizon) for j_prime in range(horizon) if j_prime != j ]
-                solver.Add(f[o.ID] <= 5)
-                solver.Add(solver.Sum([y[(o.ID,j)] for j in range(horizon)]) <= 5) #multiple days
-                solver.Add(solver.Sum([y[(o.ID,j)] for j in range(horizon)]) >= 1)
-                [solver.Add(makespan >= y[(o.ID,j)]*j) for j in range(horizon)]
+                solver.Add(finish_time_order[o.ID] <= o.delta + order_lateness[o.ID])
+                [solver.Add(finish_time_order[o.ID] >= order_to_date[(o.ID,j)]*j)for j in range(horizon)]
+                [solver.Add(order_to_date[(o.ID,j)]*j + flow_time[o.ID] >= order_to_date[(o.ID,j_prime)]* j_prime) for j in range(horizon) for j_prime in range(horizon) if j_prime != j ]
+                solver.Add(flow_time[o.ID] <= 5)
+                solver.Add(solver.Sum([order_to_date[(o.ID,j)] for j in range(horizon)]) <= 5) #multiple days
+                solver.Add(solver.Sum([order_to_date[(o.ID,j)] for j in range(horizon)]) >= 1)
+                [solver.Add(makespan >= order_to_date[(o.ID,j)]*j) for j in range(horizon)]
    
                 for i in o.sections:
                     
-                    if type(i.Group) == list:
-                        solver.Add(solver.Sum([x[(i.ID,j)] for j in i.Group]) >= 1)
-                        [solver.Add(z[(i.ID,j,k)] <= i.Time *x[(i.ID,k)]) for j in range(horizon) for k in i.Group]
-                        [solver.Add(z[(i.ID,j,k)] <= i.Time *y[(o.ID,j)]) for j in range(horizon) for k in i.Group]
-                        solver.Add(solver.Sum([z[(i.ID,j,k)]for j in range(horizon) for k in i.Group]) == int( i.Time))
-                    else:
+                    try:
+                        solver.Add(solver.Sum([sub_to_group[(i.ID,j)] for j in i.Group]) >= 1)
+                        [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *sub_to_group[(i.ID,k)]) for j in range(horizon) for k in i.Group]
+                        [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *order_to_date[(o.ID,j)]) for j in range(horizon) for k in i.Group]
+                        solver.Add(solver.Sum([sub_amount_to_group[(i.ID,j,k)]for j in range(horizon) for k in i.Group]) == int( i.Time))
+                    except:
                         k = i.Group
-                        solver.Add( x[(i.ID,k)] == 1) #one group
-                        [solver.Add(z[(i.ID,j,k)] <= i.Time *x[(i.ID,k)]) for j in range(horizon)]
-                        [solver.Add(z[(i.ID,j,k)] <= i.Time *y[(o.ID,j)]) for j in range(horizon)]
-                        solver.Add(solver.Sum([z[(i.ID,j,k)]for j in range(horizon)]) == int( i.Time))
-            #solver.Add(days_used == solver.Sum([y[(o.ID,j)]for j in range(horizon) for o in all_orders ]) )
-            solver.Add(days_used == solver.Sum([f[(o.ID)] for o in all_orders ]) )
+                        solver.Add( sub_to_group[(i.ID,k)] == 1) #one group
+                        [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *sub_to_group[(i.ID,k)]) for j in range(horizon)]
+                        [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *order_to_date[(o.ID,j)]) for j in range(horizon)]
+                        solver.Add(solver.Sum([sub_amount_to_group[(i.ID,j,k)]for j in range(horizon)]) == int( i.Time))
+            solver.Add(days_used == solver.Sum([order_to_date[(o.ID,j)]for j in range(horizon) for o in all_orders ]) )
+            solver.Add(days_used == solver.Sum([flow_time[(o.ID)] for o in all_orders ]) )
             for k, avail_hour in groups.capacity.items():
                 expr = []
                 for j in range(horizon):
                     for o in all_orders:
                         for i in o.sections:
-                            if type(i.Group) == list and k in i.Group:
-                                expr.append(z[(i.ID,j,k)])
-                            elif i.Group == k:
-                                expr.append(z[(i.ID,j,k)])
+                            try: 
+                                for k in i.Group:
+                                    expr.append(sub_amount_to_group[(i.ID,j,k)])
+                            except:
+                               if i.Group == k:
+                                    expr.append(sub_amount_to_group[(i.ID,j,k)])
                     solver.Add(solver.Sum(expr[r] for r in range(len(expr))) <= avail_hour*60)
                     expr.clear()
 
-
-            solver.Minimize(makespan + days_used)
+            solver.Add(total_lateness == solver.Sum([order_lateness[o.ID] for o in all_orders]) )
+            solver.Minimize(makespan + days_used + total_lateness)
             #solver.Minimize(makespan)
             solver.SetTimeLimit(10000)
             solver.Solve()
-            print(round(makespan.SolutionValue()))
-            print(round(days_used.SolutionValue()))
+            print('makespan is %i' %(round(makespan.SolutionValue())))
+            print('total_flow_time is %i' %(round(days_used.SolutionValue())))
+            for o in all_orders:
+                print('Amount of late for order %i is %i' %(o.ID, order_lateness[o.ID].solution_value()))
             #for o in all_orders:
+            #    days = []
+            #    [days.append(d)for d in range(horizon) if y[(o.ID,d)].solution_value() == 1]
+            #    setattr(o,'start_day', min(days))
+            #    setattr(o,'finish_day', max(days))
+            #    for s in o.sections:
+            #        try:
+            #            [setattr(s,'assigned_group', g)for g in s.Group if x[(o.ID, g)].solution_value() == 1 ]
+            #            #[setattr(s,'amount_assigned_%i'%i(d), z[(s.ID,j,g)])for g in s.Group for d in horizon if z[(s.ID,d,g)].solution_value() > 0 ]
+            #        except: 
+            #            setattr(s,'assigned_group', s.Group)
+            #            for d in range(horizon):
+            #                if z[(s.ID,d,s.assigned_group)].solution_value() > 0:
+            #                    s.amount_assigned[(d,s.assigned_group)] = z[(s.ID,d,s.assigned_group)].solution_value()
+                        #[setattr(s,'amount_assigned_%i'%(d), z[(s.ID,d,s.Group)]) for d in range(horizon) if z[(s.ID,d,s.Group)].solution_value() > 0 ]
+                    
+
             #    print(f[o.ID].SolutionValue())
             #print(best)
         #for variable in variable_list:
@@ -460,7 +459,59 @@ def main1():
     for index, list in assembly_scheduling.order_rank.items():
         print(len(list))
         assembly_scheduling.schedule(list,groups)
-     
+        if index == 1: break
+    assembly_scheduling.assign_date_after(groups,'output.csv')
+def test_multiple_groups():
+    
+    assembly_scheduling.read_data_excel('test1.xlsx', '12.02.2019','test input')
+    groups.capacity_input('capacity.csv')
+    #assembly_scheduling.assign_date_before(groups,'output.csv')
+    for index, list in assembly_scheduling.order_rank.items():
+        print(len(list))
+        assembly_scheduling.schedule(list,groups)
+        if index == 1: break
+    return 1
+    #assembly_scheduling.assign_date_after(groups,'output.csv')
+def test_one_groups():
+
+    assembly_scheduling.read_data_excel('test1.xlsx', '12.02.2019','Sheet3')
+    groups.capacity_input('capacity.csv')
+    #assembly_scheduling.assign_date_before(groups,'output.csv')
+    for index, list in assembly_scheduling.order_rank.items():
+        print(len(list))
+        assembly_scheduling.schedule(list,groups)
+        if index == 1: break
+    return 1
+def test_schedule_before():
+
+    assembly_scheduling.read_data_excel('test1.xlsx', '12.02.2019','Sheet3')
+    groups.capacity_input('capacity.csv')
+    assembly_scheduling.assign_date_before(groups,'output.csv')
+    return 1
+def test_schedule_feb15():
+
+    assembly_scheduling.read_data_excel('test/Feb14.xlsx', '14.02.2019','Production Meeting')
+    groups.capacity_input('capacity.csv')
+    assembly_scheduling.assign_date_before(groups,'output.csv')
+    return 1
+def test_schedule_feb11():
+
+    assembly_scheduling.read_data_excel('test/Feb12.xlsx', '12.02.2019','Production Meeting')
+    groups.capacity_input('capacity.csv')
+    assembly_scheduling.assign_date_before(groups,'output.csv')
+    return 1
+def test_schedule_76910():
+
+    assembly_scheduling.read_data_excel('Feb14-check.xlsx', '14.02.2019','76910')
+    groups.capacity_input('capacity.csv')
+    assembly_scheduling.assign_date_before(groups,'output.csv')
+    return 1
+def test_schedule_77356(value):
+
+    assembly_scheduling.read_data_excel('Feb14-check.xlsx', '14.02.2019',str(value))
+    groups.capacity_input('capacity.csv')
+    assembly_scheduling.assign_date_before(groups,'output.csv')
+    return 1
 def main2():
     qualified_orders = {}
     qualified_orders = assembly_scheduling.read_data_assembly('a_input.csv','14/02/2019')
@@ -470,4 +521,4 @@ def main2():
             assembly_scheduling.schedule(list, groups)
 
 if __name__ == '__main__':
-    main1()
+    test_schedule_77356()
