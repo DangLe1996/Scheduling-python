@@ -345,91 +345,91 @@ class assembly_scheduling():
  
 
 
-    def schedule(all_orders, groups):
-        if len(all_orders) > 0:
-            horizon = 5
-            from ortools.linear_solver import pywraplp
-            solver = pywraplp.Solver('CoinsGridCLP',
-                                     pywraplp.Solver.CBC_MIXED_INTEGER_PROGRAMMING)
-            sub_to_group = {} #assign sub order to a group
-            order_to_date = {} #assign order to date
-            sub_amount_to_group = {} #amount of sub order assign to group g
-            flow_time = {} #the flow time of order in the system
-            finish_time_order = {} #finish time of order
-            order_lateness = {} #finish time of order
-            variable_list = []
-            for o in all_orders:
-                flow_time[o.ID] = solver.IntVar(0,horizon, 'flow[%i]'  %(o.ID))
-                finish_time_order[o.ID] = solver.IntVar(0,horizon, 'finish[%i]'  %(o.ID))
-                order_lateness[o.ID] = solver.IntVar(0,horizon, 'late[%i]'  %(o.ID))
-                for j in range(horizon):
-                        order_to_date[(o.ID,j)] = solver.IntVar(0,1, 'y[%i,%i]'  %(o.ID,j))
-                        variable_list.append(order_to_date[(o.ID,j)])
-                for i in o.sections:
-                    try:
-                        for j in i.Group:
-                            sub_to_group[(i.ID,j)] = solver.IntVar(0,1, 'x[%i,%i]' % (i.ID,j))
-                    except:
-                        sub_to_group[(i.ID,i.Group)] = solver.IntVar(0,1,'x%i%i' %(i.ID,i.Group))
-                    for j in range(horizon):
+#     def schedule(all_orders, groups):
+#         if len(all_orders) > 0:
+#             horizon = 5
+#             from ortools.linear_solver import pywraplp
+#             solver = pywraplp.Solver('CoinsGridCLP',
+#                                      pywraplp.Solver.CBC_MIXED_INTEGER_PROGRAMMING)
+#             sub_to_group = {} #assign sub order to a group
+#             order_to_date = {} #assign order to date
+#             sub_amount_to_group = {} #amount of sub order assign to group g
+#             flow_time = {} #the flow time of order in the system
+#             finish_time_order = {} #finish time of order
+#             order_lateness = {} #finish time of order
+#             variable_list = []
+#             for o in all_orders:
+#                 flow_time[o.ID] = solver.IntVar(0,horizon, 'flow[%i]'  %(o.ID))
+#                 finish_time_order[o.ID] = solver.IntVar(0,horizon, 'finish[%i]'  %(o.ID))
+#                 order_lateness[o.ID] = solver.IntVar(0,horizon, 'late[%i]'  %(o.ID))
+#                 for j in range(horizon):
+#                         order_to_date[(o.ID,j)] = solver.IntVar(0,1, 'y[%i,%i]'  %(o.ID,j))
+#                         variable_list.append(order_to_date[(o.ID,j)])
+#                 for i in o.sections:
+#                     try:
+#                         for j in i.Group:
+#                             sub_to_group[(i.ID,j)] = solver.IntVar(0,1, 'x[%i,%i]' % (i.ID,j))
+#                     except:
+#                         sub_to_group[(i.ID,i.Group)] = solver.IntVar(0,1,'x%i%i' %(i.ID,i.Group))
+#                     for j in range(horizon):
 
-                        try:
-                            for k in i.Group:
-                                sub_amount_to_group[(i.ID,j,k)] = solver.IntVar(0,max(0,int(i.Time)), 'z[%i,%i,%i]' % (i.ID,j,k))
-                        except:
-                            sub_amount_to_group[(i.ID,j,i.Group)] = solver.IntVar(0,max(0,int(i.Time)), 'z[%i,%i,%i]' % (i.ID,j,i.Group))
+#                         try:
+#                             for k in i.Group:
+#                                 sub_amount_to_group[(i.ID,j,k)] = solver.IntVar(0,max(0,int(i.Time)), 'z[%i,%i,%i]' % (i.ID,j,k))
+#                         except:
+#                             sub_amount_to_group[(i.ID,j,i.Group)] = solver.IntVar(0,max(0,int(i.Time)), 'z[%i,%i,%i]' % (i.ID,j,i.Group))
                     
            
-            makespan = solver.IntVar(0,horizon, 'makespan')
-            days_used = solver.IntVar(0,1000, 'days_used')
-            total_lateness = solver.IntVar(0,1000, 'total_lateness')
-            for o in all_orders:
-                solver.Add(finish_time_order[o.ID] <= o.delta + order_lateness[o.ID])
-                [solver.Add(finish_time_order[o.ID] >= order_to_date[(o.ID,j)]*j)for j in range(horizon)]
-                [solver.Add(order_to_date[(o.ID,j)]*j + flow_time[o.ID] >= order_to_date[(o.ID,j_prime)]* j_prime) for j in range(horizon) for j_prime in range(horizon) if j_prime != j ]
-                solver.Add(flow_time[o.ID] <= 5)
-                solver.Add(solver.Sum([order_to_date[(o.ID,j)] for j in range(horizon)]) <= 5) #multiple days
-                solver.Add(solver.Sum([order_to_date[(o.ID,j)] for j in range(horizon)]) >= 1)
-                [solver.Add(makespan >= order_to_date[(o.ID,j)]*j) for j in range(horizon)]
+#             makespan = solver.IntVar(0,horizon, 'makespan')
+#             days_used = solver.IntVar(0,1000, 'days_used')
+#             total_lateness = solver.IntVar(0,1000, 'total_lateness')
+#             for o in all_orders:
+#                 solver.Add(finish_time_order[o.ID] <= o.delta + order_lateness[o.ID])
+#                 [solver.Add(finish_time_order[o.ID] >= order_to_date[(o.ID,j)]*j)for j in range(horizon)]
+#                 [solver.Add(order_to_date[(o.ID,j)]*j + flow_time[o.ID] >= order_to_date[(o.ID,j_prime)]* j_prime) for j in range(horizon) for j_prime in range(horizon) if j_prime != j ]
+#                 solver.Add(flow_time[o.ID] <= 5)
+#                 solver.Add(solver.Sum([order_to_date[(o.ID,j)] for j in range(horizon)]) <= 5) #multiple days
+#                 solver.Add(solver.Sum([order_to_date[(o.ID,j)] for j in range(horizon)]) >= 1)
+#                 [solver.Add(makespan >= order_to_date[(o.ID,j)]*j) for j in range(horizon)]
    
-                for i in o.sections:
+#                 for i in o.sections:
                     
-                    try:
-                        solver.Add(solver.Sum([sub_to_group[(i.ID,j)] for j in i.Group]) >= 1)
-                        [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *sub_to_group[(i.ID,k)]) for j in range(horizon) for k in i.Group]
-                        [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *order_to_date[(o.ID,j)]) for j in range(horizon) for k in i.Group]
-                        solver.Add(solver.Sum([sub_amount_to_group[(i.ID,j,k)]for j in range(horizon) for k in i.Group]) == int( i.Time))
-                    except:
-                        k = i.Group
-                        solver.Add( sub_to_group[(i.ID,k)] == 1) #one group
-                        [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *sub_to_group[(i.ID,k)]) for j in range(horizon)]
-                        [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *order_to_date[(o.ID,j)]) for j in range(horizon)]
-                        solver.Add(solver.Sum([sub_amount_to_group[(i.ID,j,k)]for j in range(horizon)]) == int( i.Time))
-            solver.Add(days_used == solver.Sum([order_to_date[(o.ID,j)]for j in range(horizon) for o in all_orders ]) )
-            solver.Add(days_used == solver.Sum([flow_time[(o.ID)] for o in all_orders ]) )
-            for k, avail_hour in groups.capacity.items():
-                expr = []
-                for j in range(horizon):
-                    for o in all_orders:
-                        for i in o.sections:
-                            try: 
-                                for k in i.Group:
-                                    expr.append(sub_amount_to_group[(i.ID,j,k)])
-                            except:
-                               if i.Group == k:
-                                    expr.append(sub_amount_to_group[(i.ID,j,k)])
-                    solver.Add(solver.Sum(expr[r] for r in range(len(expr))) <= avail_hour*60)
-                    expr.clear()
+#                     try:
+#                         solver.Add(solver.Sum([sub_to_group[(i.ID,j)] for j in i.Group]) >= 1)
+#                         [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *sub_to_group[(i.ID,k)]) for j in range(horizon) for k in i.Group]
+#                         [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *order_to_date[(o.ID,j)]) for j in range(horizon) for k in i.Group]
+#                         solver.Add(solver.Sum([sub_amount_to_group[(i.ID,j,k)]for j in range(horizon) for k in i.Group]) == int( i.Time))
+#                     except:
+#                         k = i.Group
+#                         solver.Add( sub_to_group[(i.ID,k)] == 1) #one group
+#                         [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *sub_to_group[(i.ID,k)]) for j in range(horizon)]
+#                         [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *order_to_date[(o.ID,j)]) for j in range(horizon)]
+#                         solver.Add(solver.Sum([sub_amount_to_group[(i.ID,j,k)]for j in range(horizon)]) == int( i.Time))
+#             solver.Add(days_used == solver.Sum([order_to_date[(o.ID,j)]for j in range(horizon) for o in all_orders ]) )
+#             solver.Add(days_used == solver.Sum([flow_time[(o.ID)] for o in all_orders ]) )
+#             for k, avail_hour in groups.capacity.items():
+#                 expr = []
+#                 for j in range(horizon):
+#                     for o in all_orders:
+#                         for i in o.sections:
+#                             try: 
+#                                 for k in i.Group:
+#                                     expr.append(sub_amount_to_group[(i.ID,j,k)])
+#                             except:
+#                                if i.Group == k:
+#                                     expr.append(sub_amount_to_group[(i.ID,j,k)])
+#                     solver.Add(solver.Sum(expr[r] for r in range(len(expr))) <= avail_hour*60)
+#                     expr.clear()
 
-            solver.Add(total_lateness == solver.Sum([order_lateness[o.ID] for o in all_orders]) )
-            solver.Minimize(makespan + days_used + total_lateness)
-            #solver.Minimize(makespan)
-            solver.SetTimeLimit(10000)
-            solver.Solve()
-            print('makespan is %i' %(round(makespan.SolutionValue())))
-            print('total_flow_time is %i' %(round(days_used.SolutionValue())))
-            for o in all_orders:
-                print('Amount of late for order %i is %i' %(o.ID, order_lateness[o.ID].solution_value()))
+#             solver.Add(total_lateness == solver.Sum([order_lateness[o.ID] for o in all_orders]) )
+#             solver.Minimize(makespan + days_used + total_lateness)
+#             #solver.Minimize(makespan)
+#             solver.SetTimeLimit(10000)
+#             solver.Solve()
+#             print('makespan is %i' %(round(makespan.SolutionValue())))
+#             print('total_flow_time is %i' %(round(days_used.SolutionValue())))
+#             for o in all_orders:
+#                 print('Amount of late for order %i is %i' %(o.ID, order_lateness[o.ID].solution_value()))
             #for o in all_orders:
             #    days = []
             #    [days.append(d)for d in range(horizon) if y[(o.ID,d)].solution_value() == 1]
