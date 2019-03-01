@@ -62,7 +62,7 @@ class sub_order():
         self.index = index
         self.amount_assigned = {}
 
-class assembly_scheduling():
+class machine_scheduling():
     today = 0
     SORT_ORDER = {}
     map_order ={}
@@ -92,7 +92,7 @@ class assembly_scheduling():
                     if i in sub_order.machine_status_dict and row[sub_order.machine_status_dict[i][0]] ==row[sub_order.machine_status_dict[i][2]]:
                         setattr(sub, i,math.ceil(float(getattr(sub,row[sub_order.machine_status_dict[i][1]]))))
                         if math.ceil(float(row[sub_order.machine_status_dict[i][1]])) > 0 : 
-                            sub.sequence.append(SORT_ORDER[i])
+                            sub.sequence.append(cls.SORT_ORDER[i])
                     else: setattr(sub,i , 0)
         return 1
 
@@ -196,7 +196,7 @@ class assembly_scheduling():
     #    for task_id in range(0,len(jobs_data[job]) -1 ):
     #        model.Add(all_tasks[job, task_id + 1].start >= all_tasks[job, task_id].end)
     
-
+machine_scheduling.read_data_excel("machine_input.xlsx","1.1.2019",'Data')
 
 
   

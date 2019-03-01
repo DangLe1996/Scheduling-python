@@ -341,10 +341,8 @@ class assembly_scheduling():
             except TypeError or ValueError :
                  pass
 
- 
-
-
-    def schedule(all_orders, groups):
+    @classmethod
+    def schedule(cls,all_orders, groups):
         if len(all_orders) > 0:
             horizon = 5
             from ortools.linear_solver import pywraplp
