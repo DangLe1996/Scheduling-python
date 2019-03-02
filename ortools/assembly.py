@@ -260,7 +260,7 @@ class assembly_scheduling():
         import operator
         try:
             ofile= open(output,"w")
-            ofile.write('Order, Line, Assigned Group, Start Date, Finish day, Ship day, Assembly Time, Status \n')
+            ofile.write('Order, Line, Assigned Group, Start Date,Amount , Ship day, Assembly Time\n')
         except PermissionError:
             print('Please close the file output.csv and return the program')
             ans = input("Press any button to exit")
@@ -268,9 +268,9 @@ class assembly_scheduling():
        
         #sorted(cls.map_order.values(), key=operator.attrgetter('assembly_seq'))
         #sorted(cls.map_order.items() , reverse=True, key=lambda x: x.assembly_seq)
-        output = ['Order', 'Line', 'Group','start_day', 'finish_day', 'Ship_date', 'Time', 'Status']
+        #output = ['Order', 'Line', 'Group','start_day', 'finish_day', 'Ship_date', 'Time', 'Status']
         line = []
-        useage_after= {
+        date= {
             1: 0, 
             4: 0,
             7: 0,
@@ -279,20 +279,37 @@ class assembly_scheduling():
             15:0, 
             18:0
             }
+        
         for index, list in assembly_scheduling.order_rank.items():
+            max_date= {
+            1: 0, 
+            4: 0,
+            7: 0,
+            10: 0, 
+            12: 0,
+            15:0, 
+            18:0
+            }
             for order in list:
                 for s in order.sections:
                     try:
-                        print(s.assigned_group)
-                        print('Order %i line %i' %(order.ID, s.ID))
-                        #[print('Amount assign on day %i is %i'%(getattr(s,'amount_assigned_%i'%(d)),d)) for d in range(order.start_day, order.finish_day)]
-                        #for key, amount in s.amount_assigned.items():
-                            #print(key , amount)
+                        line += str(s.Order) + ","
+                        line += str(s.Line) + ","
+                        for list, item in s.amount_assigned.items():
+                            line += str(list[1]) + ","
+                            setattr(s, 'start_day', cls.today + pd.Timedelta(list[0] + date[list[1]], unit='d'))
+                            line += str( s.start_day) + ","
+                            line += str(item) + ","
+                        line += str(s.Ship_date) + ","
+                        line += str(s.Time) + ","
+                        line += '\n'
                     except Exception as e:
                         print(e)
                         pass
             if index == 1:
                break
+        line = ''.join(line)
+        ofile.write(line)
         #for key, order in cls.map_order.items():
         #    try:
                 
@@ -435,7 +452,8 @@ class assembly_scheduling():
                     for j in range(horizon):
                         for k in s.Group:
                             if sub_amount_to_group[(s.ID,j,k)].solution_value() > 0:
-                                print('Amount of of sub %i on day %i and group %i is %i' %(s.ID, j,k, sub_amount_to_group[(s.ID,j,k)].solution_value()))
+                                s.amount_assigned[(j,k)] = sub_amount_to_group[(s.ID,j,k)].solution_value()
+                                #print('Amount of of sub %i on day %i and group %i is %i' %(s.ID, j,k, sub_amount_to_group[(s.ID,j,k)].solution_value()))
             #for o in all_orders:
             #    days = []
             #    [days.append(d)for d in range(horizon) if y[(o.ID,d)].solution_value() == 1]
@@ -476,7 +494,8 @@ def test_multiple_groups(file,date,sheet):
     for index, list in assembly_scheduling.order_rank.items():
         print(len(list))
         assembly_scheduling.schedule(list,groups)
-        if index == 4: break
+        if index == 6: break
+    assembly_scheduling.assign_date_after(groups,'output.csv')
     return 1
     #assembly_scheduling.assign_date_after(groups,'output.csv')
 def test_one_groups():
