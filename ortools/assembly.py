@@ -191,7 +191,7 @@ class assembly_scheduling():
         line2 = []
         for index, ord in cls.map_order.items():
             if len(ord.sections) > 0:
-                cls.order_rank[ord.assembly_seq].append(ord)
+                
                 setattr(ord, 'delta', ord.sections[0].delta)
                 if ord.assembly_seq == 7:
                     for s in ord.sections:
@@ -201,6 +201,7 @@ class assembly_scheduling():
                                 line2 +=','
                             line2 += '\n'
                 if ord.assembly_seq < 7:
+                    cls.order_rank[ord.assembly_seq].append(ord)
                     setattr(ord, 'group', ord.sections[0].Group)
                     cls.solution.append(ord)
         line2 = ''.join(line2)
@@ -344,6 +345,8 @@ class assembly_scheduling():
     @classmethod
     def schedule(cls,all_orders, groups):
         if len(all_orders) > 0:
+            print("Amount of orders is ",len(all_orders))
+            #horizon = len(all_orders)
             horizon = 5
             from ortools.linear_solver import pywraplp
             solver = pywraplp.Solver('CoinsGridCLP',
@@ -378,39 +381,39 @@ class assembly_scheduling():
                     
            
             makespan = solver.IntVar(0,horizon, 'makespan')
-            days_used = solver.IntVar(0,1000, 'days_used')
-            total_lateness = solver.IntVar(0,1000, 'total_lateness')
+            days_used = solver.IntVar(0,len(all_orders), 'days_used')
+            total_lateness = solver.IntVar(0,horizon*4, 'total_lateness')
             for o in all_orders:
                 solver.Add(finish_time_order[o.ID] <= o.delta + order_lateness[o.ID])
                 [solver.Add(finish_time_order[o.ID] >= order_to_date[(o.ID,j)]*j)for j in range(horizon)]
                 [solver.Add(order_to_date[(o.ID,j)]*j + flow_time[o.ID] >= order_to_date[(o.ID,j_prime)]* j_prime) for j in range(horizon) for j_prime in range(horizon) if j_prime != j ]
-                solver.Add(flow_time[o.ID] <= 5)
-                solver.Add(solver.Sum([order_to_date[(o.ID,j)] for j in range(horizon)]) <= 5) #multiple days
+                #solver.Add(flow_time[o.ID] <= 10)
+                solver.Add(solver.Sum([order_to_date[(o.ID,j)] for j in range(horizon)]) <= horizon) #multiple days
                 solver.Add(solver.Sum([order_to_date[(o.ID,j)] for j in range(horizon)]) >= 1)
                 [solver.Add(makespan >= order_to_date[(o.ID,j)]*j) for j in range(horizon)]
    
                 for i in o.sections:
                     
                     try:
-                        solver.Add(solver.Sum([sub_to_group[(i.ID,j)] for j in i.Group]) >= 1)
-                        [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *sub_to_group[(i.ID,k)]) for j in range(horizon) for k in i.Group]
-                        [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *order_to_date[(o.ID,j)]) for j in range(horizon) for k in i.Group]
+                        solver.Add(solver.Sum([sub_to_group[(i.ID,j)] for j in i.Group]) == 1) #each section is assigned to only 1 group
+                        [solver.Add(solver.Sum([sub_amount_to_group[(i.ID,j,k)] for j in range(horizon)]) <= i.Time *sub_to_group[(i.ID,k)])  for k in i.Group]
+                        [solver.Add(solver.Sum([sub_amount_to_group[(i.ID,j,k)]for k in i.Group]) <= i.Time *order_to_date[(o.ID,j)]) for j in range(horizon) ]
                         solver.Add(solver.Sum([sub_amount_to_group[(i.ID,j,k)]for j in range(horizon) for k in i.Group]) == int( i.Time))
                     except:
                         k = i.Group
-                        solver.Add( sub_to_group[(i.ID,k)] == 1) #one group
+                        solver.Add( sub_to_group[(i.ID,k)] == 1) #each section is assigned to only 1 group
                         [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *sub_to_group[(i.ID,k)]) for j in range(horizon)]
                         [solver.Add(sub_amount_to_group[(i.ID,j,k)] <= i.Time *order_to_date[(o.ID,j)]) for j in range(horizon)]
                         solver.Add(solver.Sum([sub_amount_to_group[(i.ID,j,k)]for j in range(horizon)]) == int( i.Time))
-            solver.Add(days_used == solver.Sum([order_to_date[(o.ID,j)]for j in range(horizon) for o in all_orders ]) )
+            #solver.Add(days_used == solver.Sum([order_to_date[(o.ID,j)]for j in range(horizon) for o in all_orders ]) )
             solver.Add(days_used == solver.Sum([flow_time[(o.ID)] for o in all_orders ]) )
             for k, avail_hour in groups.capacity.items():
-                expr = []
                 for j in range(horizon):
+                    expr = []
                     for o in all_orders:
                         for i in o.sections:
                             try: 
-                                for k in i.Group:
+                                if k in i.Group:
                                     expr.append(sub_amount_to_group[(i.ID,j,k)])
                             except:
                                if i.Group == k:
@@ -420,13 +423,19 @@ class assembly_scheduling():
 
             solver.Add(total_lateness == solver.Sum([order_lateness[o.ID] for o in all_orders]) )
             solver.Minimize(makespan + days_used + total_lateness)
+            #solver.Minimize(makespan + days_used)
             #solver.Minimize(makespan)
-            solver.SetTimeLimit(10000)
+            solver.SetTimeLimit(100000)
             solver.Solve()
             print('makespan is %i' %(round(makespan.SolutionValue())))
             print('total_flow_time is %i' %(round(days_used.SolutionValue())))
             for o in all_orders:
                 print('Amount of late for order %i is %i' %(o.ID, order_lateness[o.ID].solution_value()))
+                for s in o.sections:
+                    for j in range(horizon):
+                        for k in s.Group:
+                            if sub_amount_to_group[(s.ID,j,k)].solution_value() > 0:
+                                print('Amount of of sub %i on day %i and group %i is %i' %(s.ID, j,k, sub_amount_to_group[(s.ID,j,k)].solution_value()))
             #for o in all_orders:
             #    days = []
             #    [days.append(d)for d in range(horizon) if y[(o.ID,d)].solution_value() == 1]
@@ -459,15 +468,15 @@ def main1():
         assembly_scheduling.schedule(list,groups)
         if index == 1: break
     assembly_scheduling.assign_date_after(groups,'output.csv')
-def test_multiple_groups():
+def test_multiple_groups(file,date,sheet):
     
-    assembly_scheduling.read_data_excel('test1.xlsx', '12.02.2019','test input')
+    assembly_scheduling.read_data_excel(file, date,sheet)
     groups.capacity_input('capacity.csv')
     #assembly_scheduling.assign_date_before(groups,'output.csv')
     for index, list in assembly_scheduling.order_rank.items():
         print(len(list))
         assembly_scheduling.schedule(list,groups)
-        if index == 1: break
+        if index == 4: break
     return 1
     #assembly_scheduling.assign_date_after(groups,'output.csv')
 def test_one_groups():
@@ -480,27 +489,16 @@ def test_one_groups():
         assembly_scheduling.schedule(list,groups)
         if index == 1: break
     return 1
-def test_schedule_before():
 
-    assembly_scheduling.read_data_excel('test1.xlsx', '12.02.2019','Sheet3')
+def test_schedule_76910(file,date,sheet):
+
+    assembly_scheduling.read_data_excel(file, date,sheet)
     groups.capacity_input('capacity.csv')
     assembly_scheduling.assign_date_before(groups,'output.csv')
     return 1
-def test_schedule_feb15():
+def test_after(file,date,sheet):
 
-    assembly_scheduling.read_data_excel('test/Feb14.xlsx', '14.02.2019','Production Meeting')
-    groups.capacity_input('capacity.csv')
-    assembly_scheduling.assign_date_before(groups,'output.csv')
-    return 1
-def test_schedule_feb11():
-
-    assembly_scheduling.read_data_excel('test/Feb12.xlsx', '12.02.2019','Production Meeting')
-    groups.capacity_input('capacity.csv')
-    assembly_scheduling.assign_date_before(groups,'output.csv')
-    return 1
-def test_schedule_76910():
-
-    assembly_scheduling.read_data_excel('Feb14-check.xlsx', '14.02.2019','76910')
+    assembly_scheduling.read_data_excel(file, date,sheet)
     groups.capacity_input('capacity.csv')
     assembly_scheduling.assign_date_before(groups,'output.csv')
     return 1

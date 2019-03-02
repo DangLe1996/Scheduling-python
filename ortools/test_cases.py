@@ -1,5 +1,5 @@
 import assembly
-import machining
+#import machining
 import unittest
 
 #class TestAdd(unittest.TestCase):
@@ -26,4 +26,7 @@ class t76910(unittest.TestCase):
 if __name__ == '__main__':
    #unittest.main() 
    #assembly.test_schedule_77356(73799)
-   assembly.test_schedule_feb11()
+   #assembly.test_schedule_feb11()
+   #assembly.test_schedule_76910('feb11.xlsx','02.11.2019','Production Meeting')
+   assembly.test_multiple_groups('Assembly-Input.xlsx','02.11.2019','Feb11')
+   #assembly.test_multiple_groups('test1.xlsx','02.11.2019','test input')
