@@ -52,6 +52,7 @@ class sub_order():
         'Missing': 'Missing Materials', 
         'Complete': 'Complete/Partial',
         'Group' : 'Production Group',
+        #'Group' : 'Column1',
         'Resolve': 'Issue Resolved'
         }
 
@@ -269,7 +270,7 @@ class assembly_scheduling():
         #sorted(cls.map_order.values(), key=operator.attrgetter('assembly_seq'))
         #sorted(cls.map_order.items() , reverse=True, key=lambda x: x.assembly_seq)
         #output = ['Order', 'Line', 'Group','start_day', 'finish_day', 'Ship_date', 'Time', 'Status']
-        line = []
+        
         date= {
             1: 0, 
             4: 0,
@@ -281,6 +282,9 @@ class assembly_scheduling():
             }
         
         for index, list in assembly_scheduling.order_rank.items():
+            if index == 7:
+                break
+            print("index is " , index)
             max_date= {
             1: 0, 
             4: 0,
@@ -293,23 +297,30 @@ class assembly_scheduling():
             for order in list:
                 for s in order.sections:
                     try:
-                        line += str(s.Order) + ","
-                        line += str(s.Line) + ","
                         for list, item in s.amount_assigned.items():
+                            line = []
+                            line += str(s.Order) + ","
+                            line += str(s.Line) + ","
                             line += str(list[1]) + ","
                             setattr(s, 'start_day', cls.today + pd.Timedelta(list[0] + date[list[1]], unit='d'))
                             line += str( s.start_day) + ","
                             line += str(item) + ","
-                        line += str(s.Ship_date) + ","
-                        line += str(s.Time) + ","
-                        line += '\n'
+                            max_date[list[1]] = max(list[0], max_date[list[1]])
+                            line += str(s.Ship_date) + ","
+                            line += str(s.Time) + ","
+                            line += str(index) + ","
+                            line += '\n'
+                            line = ''.join(line)
+                            ofile.write(line)
                     except Exception as e:
                         print(e)
                         pass
-            if index == 1:
-               break
-        line = ''.join(line)
-        ofile.write(line)
+            for key, value in max_date.items():
+                date[key] += value + 1
+                print (date[key])
+           
+        
+        
         #for key, order in cls.map_order.items():
         #    try:
                 
@@ -383,6 +394,8 @@ class assembly_scheduling():
                         order_to_date[(o.ID,j)] = solver.IntVar(0,1, 'y[%i,%i]'  %(o.ID,j))
                         variable_list.append(order_to_date[(o.ID,j)])
                 for i in o.sections:
+                    if i.Time < 0:
+                        o.sections.remove(i)
                     try:
                         for j in i.Group:
                             sub_to_group[(i.ID,j)] = solver.IntVar(0,1, 'x[%i,%i]' % (i.ID,j))
@@ -442,18 +455,19 @@ class assembly_scheduling():
             solver.Minimize(makespan + days_used + total_lateness)
             #solver.Minimize(makespan + days_used)
             #solver.Minimize(makespan)
-            solver.SetTimeLimit(100000)
-            solver.Solve()
-            print('makespan is %i' %(round(makespan.SolutionValue())))
-            print('total_flow_time is %i' %(round(days_used.SolutionValue())))
-            for o in all_orders:
-                print('Amount of late for order %i is %i' %(o.ID, order_lateness[o.ID].solution_value()))
-                for s in o.sections:
-                    for j in range(horizon):
-                        for k in s.Group:
-                            if sub_amount_to_group[(s.ID,j,k)].solution_value() > 0:
-                                s.amount_assigned[(j,k)] = sub_amount_to_group[(s.ID,j,k)].solution_value()
-                                #print('Amount of of sub %i on day %i and group %i is %i' %(s.ID, j,k, sub_amount_to_group[(s.ID,j,k)].solution_value()))
+            solver.SetTimeLimit(50000)
+            status = solver.Solve()
+            if status == solver.OPTIMAL or status == solver.FEASIBLE:
+                print('makespan is %i' %(round(makespan.SolutionValue())))
+                print('total_flow_time is %i' %(round(days_used.SolutionValue())))
+                for o in all_orders:
+                    #print('Amount of late for order %i is %i' %(o.ID, order_lateness[o.ID].solution_value()))
+                    for s in o.sections:
+                        for j in range(horizon):
+                            for k in s.Group:
+                                if sub_amount_to_group[(s.ID,j,k)].solution_value() > 0:
+                                    s.amount_assigned[(j,k)] = sub_amount_to_group[(s.ID,j,k)].solution_value()
+                                    #print('Amount of of sub %i on day %i and group %i is %i' %(s.ID, j,k, sub_amount_to_group[(s.ID,j,k)].solution_value()))
             #for o in all_orders:
             #    days = []
             #    [days.append(d)for d in range(horizon) if y[(o.ID,d)].solution_value() == 1]
