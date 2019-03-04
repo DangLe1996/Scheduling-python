@@ -29,7 +29,7 @@ if __name__ == '__main__':
    #assembly.test_schedule_feb11()
    #assembly.test_schedule_76910('Feb13.xlsx','13.02.2019','Production Meeting')
    #assembly.test_multiple_groups('KPI_file.xlsx','11.02.2019','Feb12')
-   assembly.test_multiple_groups('Assembly-Input.xlsx','11.02.2019','Feb11')
+   assembly.test_multiple_groups('Assembly-Input.xlsx','14.02.2019','Feb14')
    #assembly.test_schedule_76910('Assembly-Input.xlsx','12.02.2019','Feb12')
    #assembly.test_schedule_76910('Feb15-v1.xlsx','15.02.2019','Production Meeting')
    #assembly.test_multiple_groups('Feb15-v1.xlsx','12.02.2019','Feb12')
