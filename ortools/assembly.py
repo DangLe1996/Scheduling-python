@@ -51,13 +51,14 @@ class sub_order():
         'Issue': 'ISSUE', 
         'Missing': 'Missing Materials', 
         'Complete': 'Complete/Partial',
-        'Group' : 'Production Group',
-        #'Group' : 'Column1',
+        #'Group' : 'Production Group',
+        'Group' : 'Production Group Axis',
         'Resolve': 'Issue Resolved'
         }
 
     def __init__(self, index ):
         self.index = index
+        self.group_assigned = 0
         self.amount_assigned = {}
     
 
@@ -186,7 +187,7 @@ class assembly_scheduling():
                     #else: print ('I got a KeyError - reason "%s"' % str(e))
                 except Exception as e: 
                         print('Order ', row['Order'], ' ', row['Line'], ' has bad value input')
-                        #del cls.map_order[sub.ID]
+               
                         print(e)
                      
         line2 = []
@@ -213,7 +214,7 @@ class assembly_scheduling():
 
 
     @classmethod
-    def assign_date_before(cls,groups, output):
+    def Case1(cls,groups, output):
         try:
             ofile= open(output,"w")
             ofile.write('Order, Line, Assigned Group, Start Date, Finish day, Ship day, Assembly Time, Status \n')
@@ -257,7 +258,7 @@ class assembly_scheduling():
             print(useage_after)
 
     @classmethod
-    def assign_date_after(cls,groups, output):
+    def case4_output(cls,groups, output):
         import operator
         try:
             ofile= open(output,"w")
@@ -266,10 +267,7 @@ class assembly_scheduling():
             print('Please close the file output.csv and return the program')
             ans = input("Press any button to exit")
             exit()
-       
-        #sorted(cls.map_order.values(), key=operator.attrgetter('assembly_seq'))
-        #sorted(cls.map_order.items() , reverse=True, key=lambda x: x.assembly_seq)
-        #output = ['Order', 'Line', 'Group','start_day', 'finish_day', 'Ship_date', 'Time', 'Status']
+
         
         date= {
             1: 0, 
@@ -280,11 +278,11 @@ class assembly_scheduling():
             15:0, 
             18:0
             }
-        
+        #cls.best_fit()
         for index, list in assembly_scheduling.order_rank.items():
             if index == 7:
                 break
-            print("index is " , index)
+            #print("index is " , index)
             max_date= {
             1: 0, 
             4: 0,
@@ -294,6 +292,7 @@ class assembly_scheduling():
             15:0, 
             18:0
             }
+            
             for order in list:
                 for s in order.sections:
                     try:
@@ -317,46 +316,13 @@ class assembly_scheduling():
                         pass
             for key, value in max_date.items():
                 date[key] += value + 1
-                print (date[key])
-           
-        
-        
-        #for key, order in cls.map_order.items():
-        #    try:
-                
-        #            #for i in output:
-        #            ##    line += str(getattr(s,i))
-        #            ##    line += ","   
-        #            ##line += "\n"
-        #    except Exception as e:
-        #        #print(e)
-        #        pass
+                #print (date[key])
+
+ 
         line = ''.join(line)
         ofile.write(line)
-        #    print('Useage per group')
-        #if len(cls.solution) > 0:
-        #    for o in cls.solution:
-        #        for s in o.sections:
-        #            try:
-        #                s.Group = int(s.Group)
-        #                start =  useage_after[s.Group]
-        #                useage_after[s.Group]  = useage_after[s.Group] + math.ceil(float(s.Time))
-        #                finish =  useage_after[s.Group]
-        #                start = math.floor((start)/ (60*groups.capacity[s.Group]))
-        #                finish =  math.floor((finish)/ (60*groups.capacity[s.Group]))
-        #                setattr(s, 'start_day', cls.today + pd.Timedelta(start, unit='d')  )
-        #                setattr(s, 'finish_day', cls.today + pd.Timedelta(finish, unit='d')  )
-        #                for i in output:
-        #                    line += str(getattr(s,i))
-        #                    line += ","   
-        #                line += "\n"
-        #                line = ''.join(line)
-        #            except Exception as e: 
-        #                pass
-        #    ofile.write(line)
-        #    print('Useage per group')
-        #    print(useage_after)
-
+   
+       
      
     @classmethod
     def map_oder_input(cls,sub):
@@ -369,9 +335,37 @@ class assembly_scheduling():
                 cls.map_order[sub.ID].a_time += math.ceil(sub.Time)
             except TypeError or ValueError :
                  pass
+    #@classmethod
+    #def best_fit(cls):
+    #    #useage = {
+    #    #    1: 0, 
+    #    #    4: 0,
+    #    #    7: 0,
+    #    #    10: 0, 
+    #    #    12: 0,
+    #    #    15:0, 
+    #    #    18:0
+
+    #    #    }
+    #    #for index, list in assembly_scheduling.order_rank.items():
+    #    #     for o in list:
+    #    #        if(o.Status > 1):
+    #    #            for s in o.sections:
+    #    #                for item, amount in s.amount_assigned.items():
+    #    #                    if(g != o.group):
+    #    #                        if(useage[o.group] - useage[g] >= o.a_time):
+    #    #                            useage[o.group] -= o.a_time
+    #    #                            useage[g] += o.a_time
+    #    #                            o.group = g
+    #    #        else:
+    #    #            for s in o.sections:
+    #    #                for item, amount in s.amount_assigned.items():
+    #    #                    useage[s.group_assigned] += amount
+    #    print('finish')
+
 
     @classmethod
-    def schedule(cls,all_orders, groups):
+    def Case4(cls,all_orders, groups):
         if len(all_orders) > 0:
             print("Amount of orders is ",len(all_orders))
             #horizon = len(all_orders)
@@ -387,7 +381,7 @@ class assembly_scheduling():
             order_lateness = {} #finish time of order
             variable_list = []
             for o in all_orders:
-                flow_time[o.ID] = solver.IntVar(0,horizon, 'flow[%i]'  %(o.ID))
+                flow_time[o.ID] = solver.IntVar(0,horizon, 'flow[%i]'  %(o.ID)) 
                 finish_time_order[o.ID] = solver.IntVar(0,horizon, 'finish[%i]'  %(o.ID))
                 order_lateness[o.ID] = solver.IntVar(0,horizon, 'late[%i]'  %(o.ID))
                 for j in range(horizon):
@@ -437,6 +431,8 @@ class assembly_scheduling():
                         solver.Add(solver.Sum([sub_amount_to_group[(i.ID,j,k)]for j in range(horizon)]) == int( i.Time))
             #solver.Add(days_used == solver.Sum([order_to_date[(o.ID,j)]for j in range(horizon) for o in all_orders ]) )
             solver.Add(days_used == solver.Sum([flow_time[(o.ID)] for o in all_orders ]) )
+
+            #capacity constraint
             for k, avail_hour in groups.capacity.items():
                 for j in range(horizon):
                     expr = []
@@ -455,9 +451,14 @@ class assembly_scheduling():
             solver.Minimize(makespan + days_used + total_lateness)
             #solver.Minimize(makespan + days_used)
             #solver.Minimize(makespan)
-            solver.SetTimeLimit(50000)
+            solver.SetTimeLimit(100000)
             status = solver.Solve()
+            print('Number of variables =', solver.NumVariables())
+            print('Number of constraints =', solver.NumConstraints())
+
             if status == solver.OPTIMAL or status == solver.FEASIBLE:
+                #gap = solver.RELATIVE_MIP_GAP
+                #print("GAP param: %f" % gap)
                 print('makespan is %i' %(round(makespan.SolutionValue())))
                 print('total_flow_time is %i' %(round(days_used.SolutionValue())))
                 for o in all_orders:
@@ -467,87 +468,100 @@ class assembly_scheduling():
                             for k in s.Group:
                                 if sub_amount_to_group[(s.ID,j,k)].solution_value() > 0:
                                     s.amount_assigned[(j,k)] = sub_amount_to_group[(s.ID,j,k)].solution_value()
-                                    #print('Amount of of sub %i on day %i and group %i is %i' %(s.ID, j,k, sub_amount_to_group[(s.ID,j,k)].solution_value()))
-            #for o in all_orders:
-            #    days = []
-            #    [days.append(d)for d in range(horizon) if y[(o.ID,d)].solution_value() == 1]
-            #    setattr(o,'start_day', min(days))
-            #    setattr(o,'finish_day', max(days))
-            #    for s in o.sections:
-            #        try:
-            #            [setattr(s,'assigned_group', g)for g in s.Group if x[(o.ID, g)].solution_value() == 1 ]
-            #            #[setattr(s,'amount_assigned_%i'%i(d), z[(s.ID,j,g)])for g in s.Group for d in horizon if z[(s.ID,d,g)].solution_value() > 0 ]
-            #        except: 
-            #            setattr(s,'assigned_group', s.Group)
-            #            for d in range(horizon):
-            #                if z[(s.ID,d,s.assigned_group)].solution_value() > 0:
-            #                    s.amount_assigned[(d,s.assigned_group)] = z[(s.ID,d,s.assigned_group)].solution_value()
-                        #[setattr(s,'amount_assigned_%i'%(d), z[(s.ID,d,s.Group)]) for d in range(horizon) if z[(s.ID,d,s.Group)].solution_value() > 0 ]
-                    
+                                    s.group_assigned = k
+         
 
-            #    print(f[o.ID].SolutionValue())
-            #print(best)
-        #for variable in variable_list:
-        #    if variable.solution_value() > 0:
-        #        print(('%s = %f' % (variable.name(), variable.solution_value())))
-def main1():
-    
-    assembly_scheduling.read_data_excel('feb12.xlsx', '12.02.2019','Production Meeting')
-    groups.capacity_input('capacity.csv')
-    #assembly_scheduling.assign_date_before(groups,'output.csv')
-    for index, list in assembly_scheduling.order_rank.items():
-        print(len(list))
-        assembly_scheduling.schedule(list,groups)
-        if index == 1: break
-    assembly_scheduling.assign_date_after(groups,'output.csv')
-def test_multiple_groups(file,date,sheet):
+def schedule_case_4(file,date,sheet):
     
     assembly_scheduling.read_data_excel(file, date,sheet)
-    groups.capacity_input('capacity.csv')
-    #assembly_scheduling.assign_date_before(groups,'output.csv')
+    groups.capacity_input('System_Files/capacity.csv')
     for index, list in assembly_scheduling.order_rank.items():
         print(len(list))
-        assembly_scheduling.schedule(list,groups)
+        assembly_scheduling.Case4(list,groups)
         if index == 6: break
-    assembly_scheduling.assign_date_after(groups,'output.csv')
+    assembly_scheduling.best_fit()
+    assembly_scheduling.case4_output(groups,'output.csv')
     return 1
-    #assembly_scheduling.assign_date_after(groups,'output.csv')
-def test_one_groups():
-
-    assembly_scheduling.read_data_excel('test1.xlsx', '12.02.2019','Sheet3')
-    groups.capacity_input('capacity.csv')
-    #assembly_scheduling.assign_date_before(groups,'output.csv')
-    for index, list in assembly_scheduling.order_rank.items():
-        print(len(list))
-        assembly_scheduling.schedule(list,groups)
-        if index == 1: break
-    return 1
-
-def test_schedule_76910(file,date,sheet):
+  
+def schedule_case_1(file,date,sheet):
 
     assembly_scheduling.read_data_excel(file, date,sheet)
-    groups.capacity_input('capacity.csv')
-    assembly_scheduling.assign_date_before(groups,'output.csv')
+    groups.capacity_input('System_Files/capacity.csv')
+    assembly_scheduling.Case1(groups,'output.csv')
     return 1
-def test_after(file,date,sheet):
 
-    assembly_scheduling.read_data_excel(file, date,sheet)
-    groups.capacity_input('capacity.csv')
-    assembly_scheduling.assign_date_before(groups,'output.csv')
-    return 1
-def test_schedule_77356(value):
+if __name__ == "__main__":
+    schedule_case_1('test/feb18.xlsx','18.02.2019','Production Meeting')
 
-    assembly_scheduling.read_data_excel('Feb14-check.xlsx', '14.02.2019',str(value))
-    groups.capacity_input('capacity.csv')
-    assembly_scheduling.assign_date_before(groups,'output.csv')
-    return 1
-def main2():
-    qualified_orders = {}
-    qualified_orders = assembly_scheduling.read_data_assembly('a_input.csv','14/02/2019')
-    groups.capacity_input('capacity.csv')
-    for index, list in qualified_orders.items():
-        if index < 7:
-            assembly_scheduling.schedule(list, groups)
 
-if __name__ == '__main__':
-    test_schedule_77356()
+
+
+
+
+
+
+
+
+
+#def test_one_groups():
+
+#    assembly_scheduling.read_data_excel('test1.xlsx', '12.02.2019','Sheet3')
+#    groups.capacity_input('capacity.csv')
+#    #assembly_scheduling.Case1(groups,'output.csv')
+#    for index, list in assembly_scheduling.order_rank.items():
+#        print(len(list))
+#        assembly_scheduling.Case4(list,groups)
+#        if index == 1: break
+#    return 1
+
+#def test_schedule_76910(file,date,sheet):
+
+#    assembly_scheduling.read_data_excel(file, date,sheet)
+#    groups.capacity_input('capacity.csv')
+#    assembly_scheduling.Case1(groups,'output.csv')
+#    return 1
+
+#def test_after(file,date,sheet):
+
+#    assembly_scheduling.read_data_excel(file, date,sheet)
+#    groups.capacity_input('capacity.csv')
+#    assembly_scheduling.Case1(groups,'output.csv')
+#    return 1
+#def test_schedule_77356(value):
+
+#    assembly_scheduling.read_data_excel('Feb14-check.xlsx', '14.02.2019',str(value))
+#    groups.capacity_input('capacity.csv')
+#    assembly_scheduling.Case1(groups,'output.csv')
+#    return 1
+#def main2():
+#    qualified_orders = {}
+#    qualified_orders = assembly_scheduling.read_data_assembly('a_input.csv','14/02/2019')
+#    groups.capacity_input('capacity.csv')
+#    for index, list in qualified_orders.items():
+#        if index < 7:
+#            assembly_scheduling.Case4(list, groups)
+
+#def main1():
+    
+#    assembly_scheduling.read_data_excel('feb12.xlsx', '12.02.2019','Production Meeting')
+#    groups.capacity_input('capacity.csv')
+#    #assembly_scheduling.Case1(groups,'output.csv')
+#    for index, list in assembly_scheduling.order_rank.items():
+#        print(len(list))
+#        assembly_scheduling.Case4(list,groups)
+#        if index == 1: break
+#    assembly_scheduling.case4_output(groups,'output.csv')
+#def test_multiple_groups(file,date,sheet):
+    
+#    assembly_scheduling.read_data_excel(file, date,sheet)
+#    groups.capacity_input('capacity.csv')
+#    #assembly_scheduling.Case1(groups,'output.csv')
+#    for index, list in assembly_scheduling.order_rank.items():
+#        print(len(list))
+#        assembly_scheduling.Case4(list,groups)
+#        if index == 6: break
+#    assembly_scheduling.case4_output(groups,'output.csv')
+#    return 1
+
+#if __name__ == '__main__':
+#    test_schedule_77356()
