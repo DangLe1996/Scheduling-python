@@ -51,8 +51,8 @@ class sub_order():
         'Issue': 'ISSUE', 
         'Missing': 'Missing Materials', 
         'Complete': 'Complete/Partial',
-        #'Group' : 'Production Group',
-        'Group' : 'Production Group Axis',
+        'Group' : 'Production Group',
+        #'Group' : 'Production Group Axis',
         'Resolve': 'Issue Resolved'
         }
 
@@ -479,7 +479,7 @@ def schedule_case_4(file,date,sheet):
         print(len(list))
         assembly_scheduling.Case4(list,groups)
         if index == 6: break
-    assembly_scheduling.best_fit()
+    # assembly_scheduling.best_fit()
     assembly_scheduling.case4_output(groups,'output.csv')
     return 1
   

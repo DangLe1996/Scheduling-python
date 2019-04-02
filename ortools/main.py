@@ -5,7 +5,7 @@ def main():
     option = int(input('Please enter 1 for assembly and 2 for machining: '))
     today = input('Please enter the date in term of DD.MM.YYYY: ')
     if option == 1:
-        case = input ('Please enter 1 for case 1 and 4 for case 4: ')
+        case = int(input ('Please enter 1 for case 1 and 4 for case 4: '))
         file = input('Please enter input file with .xlsx extension: ')
         if case == 1:
              schedule_case_1(file,today,'Production Meeting')  
@@ -14,7 +14,7 @@ def main():
         else:
             print('Wrong option, please restart the program')
     elif option == 2:
-        file = input('Please enter input file with .csv extension: ')
+        file = input('Please enter input file with .xlsx extension: ')
         generate_machine_schedule(file, today)
     else:
         print('Wrong option, please restart the program')

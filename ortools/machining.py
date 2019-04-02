@@ -199,7 +199,7 @@ class machine_scheduling():
         if sub not in cls.map_order[sub.Order].sections:
             cls.map_order[sub.Order].add_section(sub)
             if sub.status_rank[sub.Status] <  cls.map_order[sub.Order].status:
-               map_order[sub.Order].status = sub.Status
+               cls.map_order[sub.Order].status = sub.Status
     @classmethod
     def read_data_excel(cls,filename, today, sheet):
         
@@ -392,7 +392,10 @@ def main():
     machine_scheduling.generate_machining_schedule()
     machine_scheduling.output_machine('output.csv',"1.1.2019")
 def generate_machine_schedule(file, today):
-    machine_scheduling.read_data_excel("machine_input.xlsx","1.1.2019",'Data')
+    machine_scheduling.read_data_excel(file,today,'Data')
+    machine_scheduling.generate_machining_schedule()
+    machine_scheduling.output_machine('output.csv',"1.1.2019")
+
     #machine_scheduling.read_data_csv(file, today)
     #machine_scheduling.MachineShopScheduling()
     #machine_scheduling.output_machine('output.csv',today)
