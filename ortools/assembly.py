@@ -335,33 +335,6 @@ class assembly_scheduling():
                 cls.map_order[sub.ID].a_time += math.ceil(sub.Time)
             except TypeError or ValueError :
                  pass
-    #@classmethod
-    #def best_fit(cls):
-    #    #useage = {
-    #    #    1: 0, 
-    #    #    4: 0,
-    #    #    7: 0,
-    #    #    10: 0, 
-    #    #    12: 0,
-    #    #    15:0, 
-    #    #    18:0
-
-    #    #    }
-    #    #for index, list in assembly_scheduling.order_rank.items():
-    #    #     for o in list:
-    #    #        if(o.Status > 1):
-    #    #            for s in o.sections:
-    #    #                for item, amount in s.amount_assigned.items():
-    #    #                    if(g != o.group):
-    #    #                        if(useage[o.group] - useage[g] >= o.a_time):
-    #    #                            useage[o.group] -= o.a_time
-    #    #                            useage[g] += o.a_time
-    #    #                            o.group = g
-    #    #        else:
-    #    #            for s in o.sections:
-    #    #                for item, amount in s.amount_assigned.items():
-    #    #                    useage[s.group_assigned] += amount
-    #    print('finish')
 
 
     @classmethod

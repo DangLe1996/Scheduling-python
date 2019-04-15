@@ -71,9 +71,7 @@ class sub_order():
         'Scheduled/Released': 4
 
         }
-    #fields = {'Order':'Order', 'Line':'Line', 'Status':'Status', 'Ship':'Scheduled Ship Date', 'SD':'SD vs BOM', 'Saw':'Saw Cycle Time', 'Welding':'Welding Cycle Time', 'Lens':'Lens Cycle Time'
-    #          ,'Saw':'Extrusion cut double saw' , 'BA Status', 'MSLens', 'Welding Status', 'CNC Holes', 'CNC MR', 'CNC Controls',
-    #          'Puching Cycle time', 'Milling Cycle time', 'HousingCycle Time', 'Punching Required'}
+
   
 
 class machine_scheduling():
