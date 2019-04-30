@@ -1,3 +1,2 @@
-@echo off
-CMD /c python main.py
+python main.py
 pause

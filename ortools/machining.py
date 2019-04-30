@@ -79,8 +79,76 @@ class machine_scheduling():
     SORT_ORDER = {}
     map_order ={}
     solution_machining = []
+    #@classmethod
+    #def read_data_csv(cls,filename, today):
+    #    SORT_ORDER = {}
+    #    sequence = ['saw', 'mill', 'punch', 'welding', 'body_a', 'lens']
+    #    for index, i in enumerate(sequence):
+    #            cls.SORT_ORDER[i] = index
+    #    fields = ['Order', 'Line', 'Status', 'Scheduled Ship Date', 'SD vs BOM', 'Saw Cycle Time', 'Welding Cycle Time', 'Lens Cycle Time'
+    #              ,'Extrusion cut double saw' , 'BA Status', 'MSLens', 'Welding Status', 'CNC Holes', 'CNC MR', 'CNC Controls',
+    #              'Puching Cycle time', 'Milling Cycle time', 'HousingCycle Time', 'Punching Required']
+            
+    #    try:
+    #        machining_input = pd.read_csv(filename, skipinitialspace=True, usecols=fields)
+    #    except FileNotFoundError:
+    #        print('Invalid file input or file does not exist, please check again')
+    #        return 0
+   
+    #    index = 0
+    #    for index, row in machining_input.iterrows():
+    #        if row['SD vs BOM'] == True :
+    #            if(row['Order'] not in cls.map_order):
+    #                ord = order(row['Order'])
+    #                setattr(ord, 'status', sub_order.status_rank[row['Status']])
+    #                cls.map_order[row['Order']] = ord
+    #            sub = sub_order(row['Line'])
+    #            for value in fields:
+    #                setattr(sub, value, row[value])
+    #            for i in sequence:
+    #                if i in sub.machine_status_dict:
+    #                    if getattr(sub,sub.machine_status_dict[i][0]) ==sub.machine_status_dict[i][2] :
+    #                        setattr(sub, i,math.ceil(float(getattr(sub,sub.machine_status_dict[i][1]))))
+    #                        if math.ceil(float(getattr(sub,sub.machine_status_dict[i][1]))) > 0 : 
+    #                            sub.sequence.append(cls.SORT_ORDER[i])
+    #                    else: setattr(sub,i , 0)
+    #            try: 
+    #                if math.isnan(getattr(sub,'MSLens'))  :
+    #                    setattr(sub, 'lens', math.ceil(float(getattr(sub,'Lens Cycle Time'))))
+    #                    if math.ceil(float(getattr(sub,'Lens Cycle Time'))) > 0: 
+    #                        sub.sequence.append(cls.SORT_ORDER['lens'])
+    #            except  TypeError:
+    #                setattr(sub, 'lens', 0)
+    #            for i in sub.cnc_condition:
+    #                if getattr(sub,i) == 'Ready' :
+    #                    try:
+    #                        setattr(sub, 'mill', math.ceil(float(getattr(sub,'Milling Cycle time'))))
+    #                        if math.ceil(float(getattr(sub,'Milling Cycle time'))) > 0 :
+    #                            sub.sequence.append(cls.SORT_ORDER['mill'])
+    #                    except ValueError:
+    #                        pass
+    #                    break
+    #                else: 
+    #                    setattr(sub, 'mill',0)
+    #        formatter_string = "%m/%d/%Y" 
+    #        datetime_object = datetime.strptime(getattr(sub,'Scheduled Ship Date'), formatter_string)
+    #        setattr(sub,'ship_date', datetime_object.date())
+    #        sub.sequence.sort()
+    #        cls.map_oder_input_machinig(sub)
+    #        index = index + 1
+        
+    #    print('File input sucessfully')
+    #    return 1
     @classmethod
-    def read_data_csv(cls,filename, today):
+    def extract_data(cls,machining_input):
+        #sort_order = {}
+        #seq = ['saw', 'mill', 'punch', 'welding', 'body_a', 'lens']
+        #for index, i in enumerate(seq):
+        #        #cls.sort_order[i] = index
+        #        sort_order[i] = index
+        #fields = ['order', 'line', 'status', 'scheduled ship date', 'sd vs bom', 'saw cycle time', 'welding cycle time', 'lens cycle time'
+        #          ,'extrusion cut double saw' , 'ba status', 'mslens', 'welding status', 'cnc holes', 'cnc mr', 'cnc controls',
+        #          'puching cycle time', 'milling cycle time', 'housingcycle time', 'punching required']
         SORT_ORDER = {}
         sequence = ['saw', 'mill', 'punch', 'welding', 'body_a', 'lens']
         for index, i in enumerate(sequence):
@@ -88,13 +156,6 @@ class machine_scheduling():
         fields = ['Order', 'Line', 'Status', 'Scheduled Ship Date', 'SD vs BOM', 'Saw Cycle Time', 'Welding Cycle Time', 'Lens Cycle Time'
                   ,'Extrusion cut double saw' , 'BA Status', 'MSLens', 'Welding Status', 'CNC Holes', 'CNC MR', 'CNC Controls',
                   'Puching Cycle time', 'Milling Cycle time', 'HousingCycle Time', 'Punching Required']
-            
-        try:
-            machining_input = pd.read_csv(filename, skipinitialspace=True, usecols=fields)
-        except FileNotFoundError:
-            print('Invalid file input or file does not exist, please check again')
-            return 0
-   
         index = 0
         for index, row in machining_input.iterrows():
             if row['SD vs BOM'] == True :
@@ -130,67 +191,13 @@ class machine_scheduling():
                         break
                     else: 
                         setattr(sub, 'mill',0)
-            formatter_string = "%m/%d/%Y" 
-            datetime_object = datetime.strptime(getattr(sub,'Scheduled Ship Date'), formatter_string)
-            setattr(sub,'ship_date', datetime_object.date())
-            sub.sequence.sort()
-            cls.map_oder_input_machinig(sub)
-            index = index + 1
         
-        print('File input sucessfully')
-        return 1
-    @classmethod
-    def extract_data(cls,machining_input):
-        SORT_ORDER = {}
-        seq = ['saw', 'mill', 'punch', 'welding', 'body_a', 'lens']
-        for index, i in enumerate(seq):
-                cls.SORT_ORDER[i] = index
-        fields = ['Order', 'Line', 'Status', 'Scheduled Ship Date', 'SD vs BOM', 'Saw Cycle Time', 'Welding Cycle Time', 'Lens Cycle Time'
-                  ,'Extrusion cut double saw' , 'BA Status', 'MSLens', 'Welding Status', 'CNC Holes', 'CNC MR', 'CNC Controls',
-                  'Puching Cycle time', 'Milling Cycle time', 'HousingCycle Time', 'Punching Required']
-          
-   
-        index = 0
-        for index, row in machining_input.iterrows():
-            if row['SD vs BOM'] == True :
-                if(row['Order'] not in cls.map_order):
-                    ord = order(row['Order'])
-                    setattr(ord, 'status', sub_order.status_rank[row['Status']])
-                    cls.map_order[row['Order']] = ord
-                sub = sub_order(index)
-                for value in fields:
-                    setattr(sub, value, row[value])
-                for i in seq:
-                    if i in sub.machine_status_dict:
-                        if getattr(sub,sub.machine_status_dict[i][0]) ==sub.machine_status_dict[i][2] :
-                            setattr(sub, i,math.ceil(float(getattr(sub,sub.machine_status_dict[i][1]))))
-                            if math.ceil(float(getattr(sub,sub.machine_status_dict[i][1]))) > 0 : 
-                                sub.sequence.append(cls.SORT_ORDER[i])
-                        else: setattr(sub,i , 0)
-                try: 
-                    if math.isnan(getattr(sub,'MSLens'))  :
-                        setattr(sub, 'lens', math.ceil(float(getattr(sub,'Lens Cycle Time'))))
-                        if math.ceil(float(getattr(sub,'Lens Cycle Time'))) > 0: 
-                            sub.sequence.append(cls.SORT_ORDER['lens'])
-                except  TypeError:
-                    setattr(sub, 'lens', 0)
-                for i in sub.cnc_condition:
-                    if getattr(sub,i) == 'Ready' :
-                        try:
-                            setattr(sub, 'mill', math.ceil(float(getattr(sub,'Milling Cycle time'))))
-                            if math.ceil(float(getattr(sub,'Milling Cycle time'))) > 0 :
-                                sub.sequence.append(cls.SORT_ORDER['mill'])
-                        except ValueError:
-                            pass
-                        break
-                    else: 
-                        setattr(sub, 'mill',0)
         
             sub.sequence.sort()
             cls.map_oder_input_machinig(sub)
             index = index + 1
         
-        print('File input sucessfully')
+        print('file input sucessfully')
         return 1
     @classmethod
     def map_oder_input_machinig(cls,sub):
@@ -385,14 +392,14 @@ class machine_scheduling():
 
 
 def main():
-    machine_scheduling.read_data_excel("machine_input.xlsx","1.1.2019","Data")
+    machine_scheduling.read_data_excel("machine.xlsx","1.1.2019","Data")
     #machine_scheduling.read_data_csv('machine_input.csv', '10.10.2019')
     machine_scheduling.generate_machining_schedule()
     machine_scheduling.output_machine('output.csv',"1.1.2019")
 def generate_machine_schedule(file, today):
     machine_scheduling.read_data_excel(file,today,'Data')
     machine_scheduling.generate_machining_schedule()
-    machine_scheduling.output_machine('output.csv',"1.1.2019")
+    machine_scheduling.output_machine('output.csv',today)
 
     #machine_scheduling.read_data_csv(file, today)
     #machine_scheduling.MachineShopScheduling()
