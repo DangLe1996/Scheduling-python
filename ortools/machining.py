@@ -99,7 +99,7 @@ class machine_scheduling():
                 cls.SORT_ORDER[i] = index
         fields = ['Order', 'Line', 'Status', 'Scheduled Ship Date', 'SD vs Bom', 'Saw Cycle Time', 'Welding Time', 'Lens Cycle Time'
                   ,'Extrusion cut double saw' , 'BA STATUS', 'MSLens', 'Welding Corners', 'CNC Holes', 'Asymmetric (CNC)', 'CNC Controls',
-                  'Punching Cycle Time', 'CNC Cycle Time', 'BA Time', 'Punch Holes', 'Material (Stores)' ]
+                  'Punching Cycle Time', 'CNC Cycle Time', 'BA Time', 'Punch Holes', 'Material (Stores)', 'Sched Date Priority' ]
         index = 0
         for index, row in machining_input.iterrows():
             if row['SD vs Bom'] == True and row['Status'] in good_status and row['Material (Stores)'] == True:
@@ -178,6 +178,7 @@ class machine_scheduling():
             for keys, values in cls.map_order.items():
                 if values.status == i:
                     maching_orders.append(values)
+                new_list = []
                 for s in values.sections:
                     good = 0
                     if getattr(s, 'Extrusion cut double saw') == 'Done':
@@ -188,8 +189,9 @@ class machine_scheduling():
                                 good = 1
                         except AttributeError:
                                     pass
-                    if good == 0:
-                        values.sections.remove(s)
+                    if good == 1:
+                        new_list.append(s)
+                values.sections = new_list
         print("Number of Order to machine are: {}".format( len(maching_orders)))
         cls.MachineShopScheduling(maching_orders)
         cls.solution_machining.extend( maching_orders)
@@ -311,7 +313,7 @@ class machine_scheduling():
                     line += i
                     line += ' Time '
                     line += ','
-                line += 'Scheduled Ship Date,'
+                line += 'Scheduled Ship Date, Schedule Date Priority, '
                 line +='\n'
                 line = ''.join(line)
                 #ofile.write(line)
@@ -337,7 +339,8 @@ class machine_scheduling():
                             minute = s.start[attr] - day*60*7*3
                             if day_now == 0:
                                 day_now = day
-                            line +=  str(today + timedelta( days = day_now) )
+                            today = today + timedelta( days = day_now)
+                            line +=  str(today.date())
                             day_now = day_now + 1
                             line +=  str(day)
                             line += ','
@@ -354,6 +357,8 @@ class machine_scheduling():
                             line += '-'
                             line += ','
                 line += str(getattr(s, 'Scheduled Ship Date')._date_repr)
+                line += ','
+                line += str(getattr(s, 'Sched Date Priority'))
                 line += "\n"
         line = ''.join(line)
         ofile.write(line)
@@ -364,13 +369,15 @@ class machine_scheduling():
 def main():
     machine_scheduling.read_data_excel("machine_new_sample.xlsx","1.1.2019","Machine Shop Input")
     #machine_scheduling.read_data_csv('machine_input.csv', '10.10.2019')
-    if(machine_scheduling.generate_machining_schedule()):
-        machine_scheduling.output_machine('output.csv',"1.1.2019")
+    #if machine_scheduling.generate_machining_schedule():
+    machine_scheduling.generate_machining_schedule()
+    machine_scheduling.output_machine('output.csv',"1.1.2019")
 def test():
     machine_scheduling.read_data_excel("machine_new_sample.xlsx","1.1.2019","Sheet4")
     #machine_scheduling.read_data_csv('machine_input.csv', '10.10.2019')
-    if(machine_scheduling.generate_machining_schedule()):
-        machine_scheduling.output_machine('output.csv',"1.1.2019")
+    #if machine_scheduling.generate_machining_schedule():
+    machine_scheduling.generate_machining_schedule()
+    machine_scheduling.output_machine('output.csv',"1.1.2019")
 def main2():
     machine_scheduling.read_data_excel(sys.argv[1],sys.argv[2],"Machine Shop Input")
     #machine_scheduling.read_data_csv('machine_input.csv', '10.10.2019')
@@ -387,5 +394,5 @@ def generate_machine_schedule(file, today):
     #machine_scheduling.output_machine('output.csv',today)
 
 if __name__ == "__main__":
-    main()
+    main2()
     exit = input("Press any key to exit")
