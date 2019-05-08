@@ -12,7 +12,7 @@ import math
 from operator import attrgetter
 from operator import itemgetter
 from datetime import datetime,date, timedelta 
-
+import sys
 # Import Python wrapper for or-tools CP-SAT solver.
 from ortools.sat.python import cp_model
 
@@ -84,7 +84,7 @@ class machine_scheduling():
     SORT_ORDER = {}
     map_order ={}
     solution_machining = []
-    
+    sequence = ['saw', 'mill', 'punch', 'welding', 'body_a', 'lens']
     @classmethod
     def extract_data(cls,machining_input):
         good_status = [
@@ -99,10 +99,10 @@ class machine_scheduling():
                 cls.SORT_ORDER[i] = index
         fields = ['Order', 'Line', 'Status', 'Scheduled Ship Date', 'SD vs Bom', 'Saw Cycle Time', 'Welding Time', 'Lens Cycle Time'
                   ,'Extrusion cut double saw' , 'BA STATUS', 'MSLens', 'Welding Corners', 'CNC Holes', 'Asymmetric (CNC)', 'CNC Controls',
-                  'Punching Cycle Time', 'CNC Cycle Time', 'BA Time', 'Punch Holes']
+                  'Punching Cycle Time', 'CNC Cycle Time', 'BA Time', 'Punch Holes', 'Material (Stores)' ]
         index = 0
         for index, row in machining_input.iterrows():
-            if row['SD vs Bom'] == True and row['Status'] in good_status:
+            if row['SD vs Bom'] == True and row['Status'] in good_status and row['Material (Stores)'] == True:
                 if row['Order'] not in cls.map_order :
                     ord = order(row['Order'])
                     setattr(ord, 'status', sub_order.status_rank[row['Status']])
@@ -144,11 +144,12 @@ class machine_scheduling():
                     else: 
                         setattr(sub, 'mill',0)
         
-        
-            sub.sequence.sort()
-            cls.map_oder_input_machinig(sub)
+               
+                    
+                sub.sequence.sort()
+                cls.map_oder_input_machinig(sub)
             index = index + 1
-        
+       
         print('file input sucessfully')
         return 1
     @classmethod
@@ -174,10 +175,21 @@ class machine_scheduling():
     def generate_machining_schedule(cls):
         maching_orders = []
         for i in range(3,5):
-        
             for keys, values in cls.map_order.items():
                 if values.status == i:
                     maching_orders.append(values)
+                for s in values.sections:
+                    good = 0
+                    if getattr(s, 'Extrusion cut double saw') == 'Done':
+                        s.saw = 0
+                    for task_id, attr in enumerate(cls.sequence):
+                        try:
+                            if getattr(s,attr) > 0:
+                                good = 1
+                        except AttributeError:
+                                    pass
+                    if good == 0:
+                        values.sections.remove(s)
         print("Number of Order to machine are: {}".format( len(maching_orders)))
         cls.MachineShopScheduling(maching_orders)
         cls.solution_machining.extend( maching_orders)
@@ -238,8 +250,11 @@ class machine_scheduling():
 
 
              #makespan objective
-            obj_var = model.NewIntVar(0,horizon,'makespan')       
-            model.AddMaxEquality(obj_var,[s.tasks[sequence[attr]].end for o in all_orders for s in o.sections for attr in s.sequence ])    
+            obj_var = model.NewIntVar(0,horizon,'makespan')  
+            #value = 365-getattr(s,'Scheduled Ship Date').dayofyear
+            model.AddMaxEquality(obj_var,[s.tasks[sequence[attr]].end*(1) for o in all_orders for s in o.sections for attr in s.sequence ])    
+
+
             model.Minimize(obj_var)
 
             solver = cp_model.CpSolver()
@@ -296,6 +311,7 @@ class machine_scheduling():
                     line += i
                     line += ' Time '
                     line += ','
+                line += 'Scheduled Ship Date,'
                 line +='\n'
                 line = ''.join(line)
                 #ofile.write(line)
@@ -321,7 +337,7 @@ class machine_scheduling():
                             minute = s.start[attr] - day*60*7*3
                             if day_now == 0:
                                 day_now = day
-                            line +=  str(today + timedelta( days = day_now) + timedelta(minutes = minute))
+                            line +=  str(today + timedelta( days = day_now) )
                             day_now = day_now + 1
                             line +=  str(day)
                             line += ','
@@ -337,6 +353,7 @@ class machine_scheduling():
                             line += ','
                             line += '-'
                             line += ','
+                line += str(getattr(s, 'Scheduled Ship Date')._date_repr)
                 line += "\n"
         line = ''.join(line)
         ofile.write(line)
@@ -345,10 +362,21 @@ class machine_scheduling():
 
 
 def main():
-    machine_scheduling.read_data_excel("machine_new_sample.xlsx","1.1.2019","Sheet3")
+    machine_scheduling.read_data_excel("machine_new_sample.xlsx","1.1.2019","Machine Shop Input")
+    #machine_scheduling.read_data_csv('machine_input.csv', '10.10.2019')
+    if(machine_scheduling.generate_machining_schedule()):
+        machine_scheduling.output_machine('output.csv',"1.1.2019")
+def test():
+    machine_scheduling.read_data_excel("machine_new_sample.xlsx","1.1.2019","Sheet4")
+    #machine_scheduling.read_data_csv('machine_input.csv', '10.10.2019')
+    if(machine_scheduling.generate_machining_schedule()):
+        machine_scheduling.output_machine('output.csv',"1.1.2019")
+def main2():
+    machine_scheduling.read_data_excel(sys.argv[1],sys.argv[2],"Machine Shop Input")
     #machine_scheduling.read_data_csv('machine_input.csv', '10.10.2019')
     machine_scheduling.generate_machining_schedule()
-    machine_scheduling.output_machine('output.csv',"1.1.2019")
+    machine_scheduling.output_machine('output.csv',sys.argv[2])
+
 def generate_machine_schedule(file, today):
     machine_scheduling.read_data_excel(file,today,'Data')
     machine_scheduling.generate_machining_schedule()
@@ -360,3 +388,4 @@ def generate_machine_schedule(file, today):
 
 if __name__ == "__main__":
     main()
+    exit = input("Press any key to exit")
