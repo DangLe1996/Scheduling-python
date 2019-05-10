@@ -48,10 +48,10 @@ class sub_order():
                  'Complete', 'Resolve' ]
     machine_status_dict = {
     'saw' : ['Extrusion cut double saw','Saw Cycle Time',' ' ],
-    'body_a' : ['BA STATUS', 'BA Time','ToDo' ],
+    'body_a' : ['BA STATUS', 'BA Time',' ' ],
     'welding' : ['Welding Corners','Welding Time', 'ToDo'] ,
     'punch': ['Punch Holes', 'Punching Cycle Time',  'ToDo'],
-
+    'lens': ['MSLens', 'Lens Cycle Time',  ' '],
     }
     cnc_condition = ['CNC Holes', 'Asymmetric (CNC)', 'CNC Controls']
     #sequence = ['saw', 'mill', 'punch', 'welding', 'body_a', 'lens']
@@ -99,10 +99,10 @@ class machine_scheduling():
                 cls.SORT_ORDER[i] = index
         fields = ['Order', 'Line', 'Status', 'Scheduled Ship Date', 'SD vs Bom', 'Saw Cycle Time', 'Welding Time', 'Lens Cycle Time'
                   ,'Extrusion cut double saw' , 'BA STATUS', 'MSLens', 'Welding Corners', 'CNC Holes', 'Asymmetric (CNC)', 'CNC Controls',
-                  'Punching Cycle Time', 'CNC Cycle Time', 'BA Time', 'Punch Holes', 'Material (Stores)', 'Sched Date Priority' ]
+                  'Punching Cycle Time', 'CNC Cycle Time', 'BA Time', 'Punch Holes', 'MATERIAL Issue', 'Sched Date Priority' ]
         index = 0
         for index, row in machining_input.iterrows():
-            if row['SD vs Bom'] == True and row['Status'] in good_status and row['Material (Stores)'] == True:
+            if row['SD vs Bom'] == True and row['Status'] in good_status and row['MATERIAL Issue'] == 'No':
                 if row['Order'] not in cls.map_order :
                     ord = order(row['Order'])
                     setattr(ord, 'status', sub_order.status_rank[row['Status']])
@@ -115,7 +115,7 @@ class machine_scheduling():
                         setattr(sub, value, row[value])
                 for i in sequence:
                     if i in sub.machine_status_dict and not pd.isna(getattr(sub,sub.machine_status_dict[i][1])):
-                        if i == 'saw' and pd.isna( getattr(sub,sub.machine_status_dict[i][0]) ):
+                        if (i == 'saw' or i == 'body_a') and pd.isna( getattr(sub,sub.machine_status_dict[i][0]) ):
                            setattr(sub, i,math.ceil(float(getattr(sub,sub.machine_status_dict[i][1]))))
                            if math.ceil(float(getattr(sub,sub.machine_status_dict[i][1]))) > 0 : 
                                 sub.sequence.append(cls.SORT_ORDER[i])
@@ -126,7 +126,7 @@ class machine_scheduling():
                                 sub.sequence.append(cls.SORT_ORDER[i])
                         else: setattr(sub,i , 0)
                 try: 
-                    if getattr(sub,'MSLens') == 'ToDo' and not pd.isna(getattr(sub,'Lens Cycle Time')): 
+                    if pd.isna(getattr(sub,'MSLens'))  and not pd.isna(getattr(sub,'Lens Cycle Time')): 
                         setattr(sub, 'lens', math.ceil(float(getattr(sub,'Lens Cycle Time'))))
                         if math.ceil(float(getattr(sub,'Lens Cycle Time'))) > 0: 
                             sub.sequence.append(cls.SORT_ORDER['lens'])
@@ -338,11 +338,12 @@ class machine_scheduling():
                             day = math.floor(s.start[attr]/ (60*7*3))
                             minute = s.start[attr] - day*60*7*3
                             if day_now == 0:
-                                day_now = day
-                            today = today + timedelta( days = day_now)
-                            line +=  str(today.date())
-                            day_now = day_now + 1
-                            line +=  str(day)
+                                day_now = today + timedelta( days = day)
+                            else:
+                                day_now = day_now + timedelta( days = 1)
+                            line +=  str(day_now.date())
+                           
+                            #line +=  str(day)
                             line += ','
                             line += str(getattr(s,attr))
                             line += ','
@@ -394,5 +395,5 @@ def generate_machine_schedule(file, today):
     #machine_scheduling.output_machine('output.csv',today)
 
 if __name__ == "__main__":
-    main2()
+    main()
     exit = input("Press any key to exit")
