@@ -100,8 +100,8 @@ class assembly_scheduling():
         try:
             d_file= open("debug.csv","w")
             status_7= open("status_7.csv","w")
-            status_7.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials \n')
-            d_file.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials \n')
+            status_7.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials, Complete, Resolve  \n')
+            d_file.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials, Complete, Resolve \n')
         except PermissionError:
             print('Please close the file debug.csv and return the program')
             ans = input("Press any button to exit")
@@ -112,8 +112,11 @@ class assembly_scheduling():
                 if ID not in cls.bad_orders:
                         cls.bad_orders.append(ID)
                 for i in sub_order.dbug_value:
+                    if pd.isna(row[sub_order.fields_input[i]]):
+                        line += ' '
+                    else:
                         line += str(row[sub_order.fields_input[i]])
-                        line +=','
+                    line +=','
                 line += '\n'
             elif not ( row[sub_order.fields_input['Status']] in sub_order.status_rank and row[sub_order.fields_input['Complete']] == 'Complete' and (pd.isnull(row[sub_order.fields_input['Issue']]) or row[sub_order.fields_input['Issue']] == 0)): 
                 allowed_status = ['Machine Shop Finished', 'Wiring Started', 'Packaging Finished', 'Given to Shipping']
@@ -199,7 +202,10 @@ class assembly_scheduling():
                     for s in ord.sections:
                        if s.assembly_seq == 7:
                             for i in sub_order.dbug_value:
-                                line2 += str(getattr(s,i) )
+                                if pd.isna(getattr(s,i)):
+                                    line2 += ' '
+                                else:
+                                    line2 += str(getattr(s,i) )
                                 line2 +=','
                             line2 += '\n'
                 if ord.assembly_seq < 7:
@@ -455,16 +461,21 @@ def schedule_case_4(file,date,sheet):
     # assembly_scheduling.best_fit()
     assembly_scheduling.case4_output(groups,'output.csv')
     return 1
-  
+def main2():
+
+    assembly_scheduling.read_data_excel(sys.argv[1],sys.argv[2],'Production Meeting')
+    groups.capacity_input('capacity.csv')
+    assembly_scheduling.Case1(groups,'output.csv')
+
 def schedule_case_1(file,date,sheet):
 
     assembly_scheduling.read_data_excel(file, date,sheet)
-    groups.capacity_input('System_Files/capacity.csv')
+    groups.capacity_input('capacity.csv')
     assembly_scheduling.Case1(groups,'output.csv')
     return 1
 
 if __name__ == "__main__":
-    schedule_case_1('test/feb18.xlsx','18.02.2019','Production Meeting')
+    schedule_case_1('test.xlsx','18.02.2019','Production Meeting')
 
 
 
