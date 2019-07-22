@@ -12,6 +12,8 @@ import math
 from operator import attrgetter, itemgetter
 import time
 from datetime import datetime,date, timedelta 
+import sys
+import socket
 
 # Import Python wrapper for or-tools CP-SAT solver.
 
@@ -96,6 +98,7 @@ class assembly_scheduling():
         today = pd.to_datetime(today, format=formatter_string)
         cls.today = today
         line = []
+        allowed_status = ['Machine Shop Finished', 'Wiring Started', 'Packaging Finished', 'Given to Shipping']
         data_file = pd.read_excel(filename, sheet_name=sheet)
         try:
             d_file= open("debug.csv","w")
@@ -108,27 +111,30 @@ class assembly_scheduling():
             exit()
         for index, row in data_file.iterrows():
             ID = str(row[sub_order.fields_input['Order']]) + str(max(0,row[sub_order.fields_input['Ship_date']].dayofyear))
-            if row[sub_order.fields_input['Status']] not in sub_order.status_rank and row[sub_order.fields_input['Complete']] == 'Complete':
+            if row[sub_order.fields_input['Status']] not in allowed_status and row[sub_order.fields_input['Complete']] == 'Partial':
                 if ID not in cls.bad_orders:
                         cls.bad_orders.append(ID)
                 for i in sub_order.dbug_value:
-                    if pd.isna(row[sub_order.fields_input[i]]):
+                    if pd.isnull(row[sub_order.fields_input[i]]):
                         line += ' '
                     else:
                         line += str(row[sub_order.fields_input[i]])
                     line +=','
                 line += '\n'
             elif not ( row[sub_order.fields_input['Status']] in sub_order.status_rank and row[sub_order.fields_input['Complete']] == 'Complete' and (pd.isnull(row[sub_order.fields_input['Issue']]) or row[sub_order.fields_input['Issue']] == 0)): 
-                allowed_status = ['Machine Shop Finished', 'Wiring Started', 'Packaging Finished', 'Given to Shipping']
-                if row[sub_order.fields_input['Complete']] == 'Partial' and row[sub_order.fields_input['Status']] in allowed_status and (pd.isnull(row[sub_order.fields_input['Issue']]) or row[sub_order.fields_input['Issue']] == 0):
+                
+                if row[sub_order.fields_input['Status']] in allowed_status and (pd.isnull(row[sub_order.fields_input['Issue']]) or row[sub_order.fields_input['Issue']] == 0):
                     pass
                 elif ( row[sub_order.fields_input['Resolve']] == False):
                     if ID not in cls.bad_orders:
                         cls.bad_orders.append(ID)
 
                     for i in sub_order.dbug_value:
-                        line += str(row[sub_order.fields_input[i]])
-                        line +=','
+                        if pd.isnull(row[sub_order.fields_input[i]]):
+                            line += ' '
+                        else:
+                            line += str(row[sub_order.fields_input[i]])
+                        line += ','
                     line += '\n' 
         line = ''.join(line)
         print('Number of bad orders are ', len(cls.bad_orders))
@@ -202,7 +208,7 @@ class assembly_scheduling():
                     for s in ord.sections:
                        if s.assembly_seq == 7:
                             for i in sub_order.dbug_value:
-                                if pd.isna(getattr(s,i)):
+                                if pd.isnull(getattr(s,i)):
                                     line2 += ' '
                                 else:
                                     line2 += str(getattr(s,i) )
@@ -474,8 +480,11 @@ def schedule_case_1(file,date,sheet):
     assembly_scheduling.Case1(groups,'output.csv')
     return 1
 
+
 if __name__ == "__main__":
-    schedule_case_1('test.xlsx','18.02.2019','Production Meeting')
+    schedule_case_1(sys.argv[1],sys.argv[2],sys.argv[3])
+    with open('track.csv', 'a') as csvFile:
+            csvFile.write(socket.gethostname() + ','+ str(datetime.now()) + '\n')
 
 
 

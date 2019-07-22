@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['assembly_main.py'],
-             pathex=['C:\\Users\\dangl\\source\\repos\\DangLe1996\\Scheduling-python\\ortools'],
+             pathex=['C:\\Users\\dangl\\Source\\Repos\\DangLe1996\\Scheduling-python\\ortools'],
              binaries=[],
              datas=[],
              hiddenimports=[],
