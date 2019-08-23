@@ -40,7 +40,7 @@ class sub_order():
 
        }
     dbug_value = ['Order', 'Line','Status','Priority', 
-                  'Ship_date', 'Issue','Missing',
+                  'Ship_date','Time', 'Issue','Missing',
                  'Complete', 'Resolve' ]
 
     fields_input = {
@@ -103,15 +103,15 @@ class assembly_scheduling():
         try:
             d_file= open("debug.csv","w")
             status_7= open("status_7.csv","w")
-            status_7.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials, Complete, Resolve  \n')
-            d_file.write('Order, Line, Status, Promised, Scheduled Ship Date, Issue, Missing Materials, Complete, Resolve \n')
+            status_7.write('Order, Line, Status, Promised, Scheduled Ship Date,Time, Issue, Missing Materials, Complete, Resolve  \n')
+            d_file.write('Order, Line, Status, Promised, Scheduled Ship Date,Time, Issue, Missing Materials, Complete, Resolve \n')
         except PermissionError:
             print('Please close the file debug.csv and return the program')
             ans = input("Press any button to exit")
             exit()
         for index, row in data_file.iterrows():
             ID = str(row[sub_order.fields_input['Order']]) + str(max(0,row[sub_order.fields_input['Ship_date']].dayofyear))
-            if row[sub_order.fields_input['Status']] not in allowed_status and row[sub_order.fields_input['Complete']] == 'Partial':
+            if (row[sub_order.fields_input['Status']] not in allowed_status and row[sub_order.fields_input['Complete']] == 'Partial') or (row[sub_order.fields_input['Status']] == 'Machine Shop Started' and row[sub_order.fields_input['Time']] == 0):
                 if ID not in cls.bad_orders:
                         cls.bad_orders.append(ID)
                 for i in sub_order.dbug_value:
@@ -171,7 +171,9 @@ class assembly_scheduling():
                         except TypeError:
                             setattr(sub,'assembly_seq', 7 )
                     elif sub_order.status_rank[sub.Status] == 3:
-                        if sub.Missing == '=+lens' or pd.isnull(sub.Missing):
+                        if sub.Time == 0:
+                            setattr(sub,'assembly_seq', 7 )
+                        elif sub.Missing == '=+lens' or pd.isnull(sub.Missing):
                             setattr(sub,'assembly_seq', 4 )   
                         
                         elif sub.Missing == 'Material+Cartridge':
@@ -179,7 +181,6 @@ class assembly_scheduling():
                         
                         elif sub.Missing == 'Material+lens+Cartridge+Housing':
                             setattr(sub,'assembly_seq', 6 )
-                        
                         else :setattr(sub,'assembly_seq', 7 )
                     else :setattr(sub,'assembly_seq', 7 )
 
@@ -249,15 +250,32 @@ class assembly_scheduling():
         if len(cls.solution) > 0:
             for o in cls.solution:
                 for s in o.sections:
+                    #if s.Status == 'Machine Shop Started' and s.Time == 0:
+                    #    continue
                     try:
                         s.Group = int(s.Group)
                         start =  useage_after[s.Group]
                         useage_after[s.Group]  = useage_after[s.Group] + math.ceil(float(s.Time))
                         finish =  useage_after[s.Group]
                         start = math.floor((start)/ (60*groups.capacity[s.Group]))
-                        finish =  math.floor((finish)/ (60*groups.capacity[s.Group]))
-                        setattr(s, 'start_day', cls.today + pd.Timedelta(start, unit='d')  )
-                        setattr(s, 'finish_day', cls.today + pd.Timedelta(finish, unit='d')  )
+                        start = cls.today + pd.Timedelta(start, unit='d')
+                        diff = 0
+
+                        if(start.dayofweek == 5):
+                            diff = 2
+                        elif start.dayofweek == 6:
+                            diff = 1
+                        start = start + pd.Timedelta(diff, unit='d')
+                        finish =  math.floor((finish)/ (60*groups.capacity[s.Group])) + diff
+                        finish = cls.today + pd.Timedelta(finish, unit='d')
+                        diff = 0
+                        if(finish.dayofweek == 5):
+                            diff = 2
+                        elif finish.dayofweek == 6:
+                            diff = 1
+                        finish =  finish  + pd.Timedelta(diff, unit='d')
+                        setattr(s, 'start_day',  start )
+                        setattr(s, 'finish_day',  finish )
                         for i in output:
                             line += str(getattr(s,i))
                             line += ","   
@@ -313,6 +331,8 @@ class assembly_scheduling():
                             line += str(s.Order) + ","
                             line += str(s.Line) + ","
                             line += str(list[1]) + ","
+                            day = cls.today + pd.Timedelta(list[0] + date[list[1]], unit='d')
+                            weekno = day.weekday()
                             setattr(s, 'start_day', cls.today + pd.Timedelta(list[0] + date[list[1]], unit='d'))
                             line += str( s.start_day) + ","
                             line += str(item) + ","
@@ -473,6 +493,18 @@ def main2():
     groups.capacity_input('capacity.csv')
     assembly_scheduling.Case1(groups,'output.csv')
 
+def main3():
+
+    assembly_scheduling.read_data_excel('test.xlsx','10.08.2019','Production Meeting')
+    groups.capacity_input('capacity.csv')
+    assembly_scheduling.Case1(groups,'output.csv')
+
+def main4():
+
+    assembly_scheduling.read_data_excel('test-82442.xlsx','10.08.2019','Production Meeting')
+    groups.capacity_input('capacity.csv')
+    assembly_scheduling.Case1(groups,'output.csv')
+
 def schedule_case_1(file,date,sheet):
 
     assembly_scheduling.read_data_excel(file, date,sheet)
@@ -482,9 +514,8 @@ def schedule_case_1(file,date,sheet):
 
 
 if __name__ == "__main__":
-    schedule_case_1(sys.argv[1],sys.argv[2],sys.argv[3])
-    with open('track.csv', 'a') as csvFile:
-            csvFile.write(socket.gethostname() + ','+ str(datetime.now()) + '\n')
+    main4()
+    
 
 
 
